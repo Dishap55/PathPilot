@@ -27,6 +27,7 @@ export default function Signup() {
   const [agreed, setAgreed] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+  const [isGitHubSubmitting, setIsGitHubSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [showAccountExistsModal, setShowAccountExistsModal] = useState(false);
@@ -110,12 +111,12 @@ export default function Signup() {
         setSuccessMessage('Account created successfully! Welcome to PathPilot.');
         setTimeout(() => {
           navigate('/profile-setup');
-        }, 800);
+        }, 150);
       } else {
         setSuccessMessage('Account created! Redirecting to setup...');
         setTimeout(() => {
           navigate('/profile-setup');
-        }, 800);
+        }, 150);
       }
     } catch (err) {
       console.error('[Signup] Registration exception:', err);
@@ -154,6 +155,21 @@ export default function Signup() {
     } catch (err) {
       setErrorMessage('Google authentication could not be completed.');
       setIsGoogleSubmitting(false);
+    }
+  };
+
+  const handleGitHubSignup = async () => {
+    setIsGitHubSubmitting(true);
+    setErrorMessage('');
+    try {
+      const { error } = await authService.signInWithGitHub();
+      if (error) {
+        setErrorMessage(error.message || 'Unable to connect to GitHub authentication.');
+        setIsGitHubSubmitting(false);
+      }
+    } catch (err) {
+      setErrorMessage('GitHub authentication could not be completed.');
+      setIsGitHubSubmitting(false);
     }
   };
 
@@ -341,7 +357,7 @@ export default function Signup() {
             {/* Create Account Primary Button */}
             <button
               type="submit"
-              disabled={isSubmitting || isGoogleSubmitting || !agreed}
+              disabled={isSubmitting || isGoogleSubmitting || isGitHubSubmitting || !agreed}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 hover:shadow-2xl hover:shadow-indigo-600/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none cursor-pointer mt-2"
             >
               {isSubmitting ? (
@@ -368,42 +384,67 @@ export default function Signup() {
             </span>
           </div>
 
-          {/* Google Button */}
-          <button
-            type="button"
-            onClick={handleGoogleSignup}
-            disabled={isSubmitting || isGoogleSubmitting}
-            className="w-full flex items-center justify-center gap-3 py-3 rounded-2xl bg-white/90 hover:bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer disabled:opacity-50"
-          >
-            {isGoogleSubmitting ? (
-              <span className="flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-slate-600 border-t-transparent rounded-full animate-spin" />
-                <span>Connecting to Google...</span>
-              </span>
-            ) : (
-              <>
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17Z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24Z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.98 0 12s.45 3.83 1.25 5.42l4.03-3.15Z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"
-                  />
-                </svg>
-                <span>Continue with Google</span>
-              </>
-            )}
-          </button>
+          {/* Social Authentication Buttons */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Google Button */}
+            <button
+              type="button"
+              onClick={handleGoogleSignup}
+              disabled={isSubmitting || isGoogleSubmitting || isGitHubSubmitting}
+              className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl bg-white/90 hover:bg-white border border-slate-200 text-slate-700 text-xs font-bold shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer disabled:opacity-50"
+            >
+              {isGoogleSubmitting ? (
+                <span className="flex items-center gap-1.5">
+                  <span className="w-3.5 h-3.5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                  <span>Connecting...</span>
+                </span>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17Z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24Z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.98 0 12s.45 3.83 1.25 5.42l4.03-3.15Z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"
+                    />
+                  </svg>
+                  <span>Continue with Google</span>
+                </>
+              )}
+            </button>
+
+            {/* GitHub Button */}
+            <button
+              type="button"
+              onClick={handleGitHubSignup}
+              disabled={isSubmitting || isGoogleSubmitting || isGitHubSubmitting}
+              className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl bg-white/90 hover:bg-white border border-slate-200 text-slate-700 text-xs font-bold shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer disabled:opacity-50"
+            >
+              {isGitHubSubmitting ? (
+                <span className="flex items-center gap-1.5">
+                  <span className="w-3.5 h-3.5 border-2 border-slate-700 border-t-transparent rounded-full animate-spin" />
+                  <span>Connecting...</span>
+                </span>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 shrink-0 fill-current text-slate-900" viewBox="0 0 24 24">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z" />
+                  </svg>
+                  <span>Continue with GitHub</span>
+                </>
+              )}
+            </button>
+          </div>
 
           {/* Login Link */}
           <p className="text-center text-xs text-slate-500 font-medium mt-5">

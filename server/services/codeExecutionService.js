@@ -6,10 +6,11 @@ class CodeExecutionService {
   }
   async submitCode(sourceCode, language, questionId, studentId) {
     const result = await judge0Client.executeCode(sourceCode, language);
+    const passed = Boolean(result?.passed || result?.status?.id === 3);
     return {
       question_id: questionId,
       student_id: studentId,
-      status: 'passed',
+      status: passed ? 'passed' : 'failed',
       result
     };
   }

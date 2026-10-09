@@ -180,9 +180,13 @@ export default function MilestoneDetail() {
         language: codingQ.language || milestoneData?.content?.preferred_language || 'C++'
       });
 
-      setCodeOutput(res.evaluation?.stdout || 'Execution complete. Verdict: ' + (res.evaluation?.status || 'Accepted'));
-      if (res.progress) {
-        setMilestoneData(prev => ({ ...prev, progress: res.progress }));
+      if (res.evaluation?.is_correct) {
+        setCodeOutput(res.evaluation?.stdout || 'Execution complete. Verdict: Accepted');
+        if (res.progress) {
+          setMilestoneData(prev => ({ ...prev, progress: res.progress }));
+        }
+      } else {
+        setCodeError(res.evaluation?.feedback || res.evaluation?.stdout || 'Test case verification failed: code output mismatch or incomplete logic.');
       }
     } catch (err) {
       setCodeError(err.message || 'Execution error.');

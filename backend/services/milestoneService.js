@@ -583,10 +583,11 @@ const milestoneService = {
         });
       } catch (jErr) {
         judgeResult = {
-          status: 'Accepted',
-          stdout: '2',
-          runtime_ms: 12,
-          memory_kb: 450
+          status: 'Wrong Answer',
+          stdout: null,
+          stderr: jErr.message || 'Execution error in sandbox',
+          runtime_ms: 0,
+          memory_kb: 0
         };
       }
 
@@ -615,10 +616,11 @@ const milestoneService = {
         });
       } catch (sErr) {
         sqlResult = {
-          success: true,
-          columns: ['name', 'employee_count'],
-          rows: [{ name: 'Engineering', employee_count: 5 }, { name: 'Marketing', employee_count: 0 }],
-          rowCount: 2
+          success: false,
+          error: sErr.message || 'SQL execution failed in sandbox',
+          columns: [],
+          rows: [],
+          rowCount: 0
         };
       }
 

@@ -16,6 +16,7 @@ import {
   Meh
 } from 'lucide-react';
 import { assessmentService } from '../../services/assessmentService';
+import { evaluateProblemSolution, evaluateSQLQuery, evaluateOOPSSolution } from '../../utils/codeEvaluator';
 
 const CONFIDENCE_LEVELS = [
   { id: 'guessing', label: 'Guessing', emoji: '🤔', color: 'hover:border-amber-300 hover:bg-amber-50/50' },
@@ -130,7 +131,7 @@ export default function AssessmentQuestionCard({
     }
   };
 
-  // Run code handler
+  // Run code handler with accurate evaluation
   const handleRunCode = async () => {
     setIsRunningCode(true);
     setRunOutput(null);
@@ -141,23 +142,45 @@ export default function AssessmentQuestionCard({
         } catch (e) {
           // sandbox fallback
         }
-        const cases = question?.testCases || [{ id: 1, title: 'Sample SQL Query', expected: 'Valid result set' }];
-        const hasCodeAttempt = Boolean(code && code.trim().length > 10);
-        const passedCount = hasCodeAttempt ? cases.length : 0;
+        const evalResult = evaluateSQLQuery(
+          code,
+          question?.problemStatement,
+          question?.testCases,
+          question?.sample_data || question?.sampleData,
+          question?.expected_result || question?.expectedResult,
+          question?.solution_query || question?.solutionQuery
+        );
         setRunOutput({
-          status: hasCodeAttempt ? 'Accepted' : 'No Query Executed',
-          passed: hasCodeAttempt,
-          passedCount,
-          totalCount: cases.length,
-          caseResults: cases.map((tc, idx) => ({
+          status: evalResult.status,
+          passed: evalResult.allPassed,
+          passedCount: evalResult.passedCount,
+          totalCount: evalResult.totalCount,
+          caseResults: evalResult.cases.map((tc, idx) => ({
             id: tc.id || idx + 1,
             title: tc.title || `Test Case ${idx + 1}`,
-            passed: hasCodeAttempt,
-            input: tc.input || 'Table: employees',
-            expected: tc.expected || 'Rows returned matching condition',
-            actual: hasCodeAttempt ? tc.expected : 'Query failed or empty'
+            passed: tc.passed,
+            input: tc.input || 'Table schema evaluation',
+            expected: tc.expected || 'Matching result set',
+            actual: tc.actual
           })),
-          output: hasCodeAttempt ? 'SQL query evaluated successfully against sample database.' : 'Please enter a SQL query.'
+          output: evalResult.output
+        });
+      } else if (question?.subject === 'OOPS') {
+        const evalResult = evaluateOOPSSolution(question, code, selectedLanguage);
+        setRunOutput({
+          status: evalResult.allPassed ? 'Accepted' : 'Failed',
+          passed: evalResult.allPassed,
+          passedCount: evalResult.casesPassed,
+          totalCount: evalResult.totalCases,
+          caseResults: (evalResult.cases || []).map((tc, idx) => ({
+            id: tc.id || idx + 1,
+            title: tc.title || `Test Case ${idx + 1}`,
+            passed: tc.passed,
+            input: tc.input || 'Class instantiation',
+            expected: tc.expected || 'Expected result',
+            actual: tc.actual
+          })),
+          output: evalResult.output
         });
       } else {
         try {
@@ -166,47 +189,39 @@ export default function AssessmentQuestionCard({
           // sandbox fallback execution
         }
 
-        const cases = (question?.testCases && question.testCases.length > 0)
-          ? question.testCases
-          : [{ id: 1, title: 'Sample Case 1', input: 'Sample Input', expected: 'Output verified' }];
-
-        const hasCodeAttempt = Boolean(code && code.trim().length > 15);
-        const passedCount = hasCodeAttempt ? Math.max(1, cases.length) : 0;
-
+        const evalResult = evaluateProblemSolution(question, code, selectedLanguage);
         setRunOutput({
-          status: hasCodeAttempt ? 'Accepted' : 'No Code Executed',
-          passed: hasCodeAttempt,
-          passedCount,
-          totalCount: cases.length,
-          caseResults: cases.map((tc, idx) => ({
+          status: evalResult.status,
+          passed: evalResult.allPassed,
+          passedCount: evalResult.passedCount,
+          totalCount: evalResult.totalCount,
+          caseResults: evalResult.cases.map((tc, idx) => ({
             id: tc.id || idx + 1,
             title: tc.title || `Test Case ${idx + 1}`,
-            passed: hasCodeAttempt,
+            passed: tc.passed,
             input: tc.input || 'Sample Input',
-            expected: tc.expected || 'Sample Expected Output',
-            actual: hasCodeAttempt ? tc.expected : 'Execution failed or empty solution'
+            expected: tc.expected || 'Expected Output',
+            actual: tc.actual
           })),
-          output: hasCodeAttempt
-            ? `✓ ${passedCount}/${cases.length} Sample test cases executed and passed (${selectedLanguage.toUpperCase()}).\nRuntime: 0.04s | Memory: 3.2MB\nStandard Output: Execution finished without errors.`
-            : 'Please write your solution code before running test cases.'
+          output: evalResult.output
         });
       }
     } catch (err) {
       const cases = question?.testCases || [{ id: 1, title: 'Sample Case 1', input: 'Sample Input', expected: 'Output verified' }];
       setRunOutput({
-        status: 'Accepted',
-        passed: true,
-        passedCount: 1,
+        status: 'Execution Error',
+        passed: false,
+        passedCount: 0,
         totalCount: cases.length,
         caseResults: cases.map((tc, idx) => ({
           id: tc.id || idx + 1,
           title: tc.title || `Test Case ${idx + 1}`,
-          passed: true,
+          passed: false,
           input: tc.input || 'Sample Input',
           expected: tc.expected || 'Sample Expected Output',
-          actual: tc.expected || 'Sample Expected Output'
+          actual: `Execution Error: ${err.message || 'Execution failed'}`
         })),
-        output: 'Test case executed in local environment (1/1 passed).'
+        output: `❌ Sandbox Execution Error: ${err.message || 'Error executing test cases.'}`
       });
     } finally {
       setIsRunningCode(false);
@@ -224,17 +239,33 @@ export default function AssessmentQuestionCard({
         isSkipped: false
       });
     } else {
-      const hasCodeAttempt = Boolean(code && code.trim().length > 20);
-      const passedCount = runOutput?.passedCount !== undefined
-        ? runOutput.passedCount
-        : (hasCodeAttempt ? 1 : 0);
+      let finalPassedCount = runOutput?.passedCount;
+      if (finalPassedCount === undefined) {
+        if (question?.subject === 'DBMS' || question?.supportedLanguages?.includes('sql')) {
+          const sqlRes = evaluateSQLQuery(
+            code,
+            question?.problemStatement,
+            question?.testCases,
+            question?.sample_data || question?.sampleData,
+            question?.expected_result || question?.expectedResult,
+            question?.solution_query || question?.solutionQuery
+          );
+          finalPassedCount = sqlRes.passedCount;
+        } else if (question?.subject === 'OOPS') {
+          const oopsRes = evaluateOOPSSolution(question, code, selectedLanguage);
+          finalPassedCount = oopsRes.casesPassed;
+        } else {
+          const evalRes = evaluateProblemSolution(question, code, selectedLanguage);
+          finalPassedCount = evalRes.passedCount;
+        }
+      }
 
       onSubmit({
         answer: code,
         confidence,
         codingLanguage: selectedLanguage,
         codeSubmitted: code,
-        testCasesPassed: passedCount,
+        testCasesPassed: finalPassedCount,
         isSkipped: false
       });
     }

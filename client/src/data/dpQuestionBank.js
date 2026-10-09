@@ -33,6 +33,7 @@ export const DP_QUESTION_BANK = [
       { input: 'n = 3', output: '3', explanation: '1. 1+1+1, 2. 1+2, 3. 2+1' }
     ],
     constraints: ['1 <= n <= 45'],
+    functionName: 'climbStairs',
     starterCode: {
       'Python': `def climbStairs(n):
     # Write your code here
@@ -55,16 +56,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'n = 3',
-        expected: '3',
-        actual: hasValidCode ? '3' : '0',
-        passed: hasValidCode,
-        visualHint: 'dp[i] = dp[i-1] + dp[i-2] with base cases dp[1]=1, dp[2]=2.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "n = 3",
+            "expected": "3",
+            "visualHint": "dp[i] = dp[i-1] + dp[i-2] with base cases dp[1]=1, dp[2]=2."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Subproblem optimal substructure: to reach step i, you come from step i-1 (1 step) or step i-2 (2 steps).',
       timeComplexity: 'O(N)',
@@ -91,6 +91,7 @@ public:
       { input: 'nums = [1,2,3,1]', output: '4', explanation: 'Rob house 1 (money = 1) and rob house 3 (money = 3). Total = 4.' }
     ],
     constraints: ['1 <= nums.length <= 100', '0 <= nums[i] <= 400'],
+    functionName: 'rob',
     starterCode: {
       'Python': `def rob(nums):
     # Write your code here
@@ -117,16 +118,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1,2,3,1]',
-        expected: '4',
-        actual: hasValidCode ? '4' : '0',
-        passed: hasValidCode,
-        visualHint: 'dp[i] = max(dp[i-1], dp[i-2] + nums[i]). Space reduce to 2 variables.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1,2,3,1]",
+            "expected": "4",
+            "visualHint": "dp[i] = max(dp[i-1], dp[i-2] + nums[i]). Space reduce to 2 variables."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'At house i, choose either rob house i (nums[i] + rob(i-2)) or skip house i (rob(i-1)).',
       timeComplexity: 'O(N)',
@@ -152,6 +152,7 @@ public:
       { input: 'coins = [1,2,5], amount = 11', output: '3', explanation: '11 = 5 + 5 + 1' }
     ],
     constraints: ['1 <= coins.length <= 12', '1 <= amount <= 10^4'],
+    functionName: 'coinChange',
     starterCode: {
       'Python': `def coinChange(coins, amount):
     # Write your code here
@@ -178,16 +179,15 @@ public:
     return -1;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'coins = [1,2,5], amount = 11',
-        expected: '3',
-        actual: hasValidCode ? '3' : '-1',
-        passed: hasValidCode,
-        visualHint: 'Unbounded Knapsack DP: dp[a] = min(dp[a], 1 + dp[a - coin]).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "coins = [1,2,5], amount = 11",
+            "expected": "3",
+            "visualHint": "Unbounded Knapsack DP: dp[a] = min(dp[a], 1 + dp[a - coin])."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Bottom-up tabulation: dp[a] represents min coins to form target amount a.',
       timeComplexity: 'O(amount * N)',
@@ -214,6 +214,7 @@ public:
       { input: 'm = 3, n = 7', output: '28' }
     ],
     constraints: ['1 <= m, n <= 100'],
+    functionName: 'uniquePaths',
     starterCode: {
       'Python': `def uniquePaths(m, n):
     # Write your code here
@@ -239,16 +240,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'm = 3, n = 7',
-        expected: '28',
-        actual: hasValidCode ? '28' : '0',
-        passed: hasValidCode,
-        visualHint: 'dp[r][c] = dp[r-1][c] (from top) + dp[r][c-1] (from left).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "m = 3, n = 7",
+            "expected": "28",
+            "visualHint": "dp[r][c] = dp[r-1][c] (from top) + dp[r][c-1] (from left)."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Paths to cell (r, c) equal sum of unique paths coming from cell above and cell to the left.',
       timeComplexity: 'O(M * N)',
@@ -277,6 +277,7 @@ public:
       { input: 'text1 = "abcde", text2 = "ace"', output: '3', explanation: 'The longest common subsequence is "ace" and its length is 3.' }
     ],
     constraints: ['1 <= text1.length, text2.length <= 1000'],
+    functionName: 'longestCommonSubsequence',
     starterCode: {
       'Python': `def longestCommonSubsequence(text1, text2):
     # Write your code here
@@ -304,16 +305,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'text1 = "abcde", text2 = "ace"',
-        expected: '3',
-        actual: hasValidCode ? '3' : '0',
-        passed: hasValidCode,
-        visualHint: 'If text1[i] == text2[j], dp[i][j] = 1 + dp[i+1][j+1]. Else max(dp[i+1][j], dp[i][j+1]).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "text1 = \"abcde\", text2 = \"ace\"",
+            "expected": "3",
+            "visualHint": "If text1[i] == text2[j], dp[i][j] = 1 + dp[i+1][j+1]. Else max(dp[i+1][j], dp[i][j+1])."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: '2D DP grid compares characters at indices i and j.',
       timeComplexity: 'O(M * N)',
@@ -341,6 +341,7 @@ public:
       { input: 'word1 = "horse", word2 = "ros"', output: '3' }
     ],
     constraints: ['0 <= word1.length, word2.length <= 500'],
+    functionName: 'minDistance',
     starterCode: {
       'Python': `def minDistance(word1, word2):
     # Write your code here
@@ -368,16 +369,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'word1 = "horse", word2 = "ros"',
-        expected: '3',
-        actual: hasValidCode ? '3' : '0',
-        passed: hasValidCode,
-        visualHint: 'If chars match: dp[i][j] = dp[i-1][j-1]. Else 1 + min(insert, delete, replace).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "word1 = \"horse\", word2 = \"ros\"",
+            "expected": "3",
+            "visualHint": "If chars match: dp[i][j] = dp[i-1][j-1]. Else 1 + min(insert, delete, replace)."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Classic Levenshtein distance 2D DP matrix transitions.',
       timeComplexity: 'O(M * N)',

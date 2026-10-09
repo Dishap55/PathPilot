@@ -33,6 +33,7 @@ export const SORTING_QUESTION_BANK = [
       { input: 'nums = [5, 1, 1, 2, 0, 0]', output: '[0, 0, 1, 1, 2, 5]' }
     ],
     constraints: ['1 <= nums.length <= 5 * 10^4', '-5 * 10^4 <= nums[i] <= 5 * 10^4'],
+    functionName: 'sortArray',
     starterCode: {
       'Python': `def sortArray(nums):
     # Write your code here (Merge Sort or Quick Sort)
@@ -59,16 +60,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [5, 2, 3, 1]',
-        expected: '[1, 2, 3, 5]',
-        actual: hasValidCode ? '[1, 2, 3, 5]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Merge Sort recursively divides array into halves, then merges sorted subarrays.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [5, 2, 3, 1]",
+            "expected": "[1, 2, 3, 5]",
+            "visualHint": "Merge Sort recursively divides array into halves, then merges sorted subarrays."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Merge Sort guarantees O(N log N) time complexity in worst case with stable sorting.',
       timeComplexity: 'O(N log N)',
@@ -94,6 +94,7 @@ public:
       { input: 'intervals = [[1,3],[2,6],[8,10],[15,18]]', output: '[[1,6],[8,10],[15,18]]' }
     ],
     constraints: ['1 <= intervals.length <= 10^4', 'intervals[i].length == 2'],
+    functionName: 'merge',
     starterCode: {
       'Python': `def merge(intervals):
     # Write your code here
@@ -120,16 +121,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'intervals = [[1,3],[2,6],[8,10],[15,18]]',
-        expected: '[[1,6],[8,10],[15,18]]',
-        actual: hasValidCode ? '[[1,6],[8,10],[15,18]]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Sort intervals by start time. If current.start <= prev.end, merge by updating prev.end = max(prev.end, current.end).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "intervals = [[1,3],[2,6],[8,10],[15,18]]",
+            "expected": "[[1,6],[8,10],[15,18]]",
+            "visualHint": "Sort intervals by start time. If current.start <= prev.end, merge by updating prev.end = max(prev.end, current.end)."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Sorting by start time ensures overlapping intervals become adjacent in the list.',
       timeComplexity: 'O(N log N)',
@@ -156,6 +156,7 @@ public:
       { input: 'nums = [2,0,2,1,1,0]', output: '[0,0,1,1,2,2]' }
     ],
     constraints: ['n == nums.length', '1 <= n <= 300', 'nums[i] is 0, 1, or 2'],
+    functionName: 'sortColors',
     starterCode: {
       'Python': `def sortColors(nums):
     # Modify nums in-place
@@ -179,16 +180,15 @@ public:
     // Write your code here
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [2,0,2,1,1,0]',
-        expected: '[0,0,1,1,2,2]',
-        actual: hasValidCode ? '[0,0,1,1,2,2]' : '[2,0,2,1,1,0]',
-        passed: hasValidCode,
-        visualHint: 'Dutch National Flag algorithm: low=0, mid=0, high=N-1. Swap 0s to low, 2s to high.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [2,0,2,1,1,0]",
+            "expected": "[0,0,1,1,2,2]",
+            "visualHint": "Dutch National Flag algorithm: low=0, mid=0, high=N-1. Swap 0s to low, 2s to high."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Three-way partitioning sorts 0s, 1s, and 2s in a single pass in O(N) time and O(1) space.',
       timeComplexity: 'O(N)',
@@ -216,6 +216,7 @@ public:
       { input: 'nums = [3,2,1,5,6,4], k = 2', output: '5' }
     ],
     constraints: ['1 <= k <= nums.length <= 10^5'],
+    functionName: 'findKthLargest',
     starterCode: {
       'Python': `def findKthLargest(nums, k):
     # Write your code here (QuickSelect or Min-Heap)
@@ -242,16 +243,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [3,2,1,5,6,4], k = 2',
-        expected: '5',
-        actual: hasValidCode ? '5' : '0',
-        passed: hasValidCode,
-        visualHint: 'QuickSelect partitions array around pivot to find target index N - k in average O(N).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [3,2,1,5,6,4], k = 2",
+            "expected": "5",
+            "visualHint": "QuickSelect partitions array around pivot to find target index N - k in average O(N)."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'QuickSelect algorithm prunes half of partition at each step, yielding O(N) average time.',
       timeComplexity: 'O(N) average',
@@ -278,6 +278,7 @@ public:
       { input: 'head = [4, 2, 1, 3]', output: '[1, 2, 3, 4]' }
     ],
     constraints: ['Number of nodes in list is in range [1, 5000]'],
+    functionName: 'insertionSortList',
     starterCode: {
       'Python': `def insertionSortList(head):
     # Write your code here
@@ -300,16 +301,15 @@ public:
     return null;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'head = [4, 2, 1, 3]',
-        expected: '[1, 2, 3, 4]',
-        actual: hasValidCode ? '[1, 2, 3, 4]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Maintain dummy head for sorted portion and insert current node into correct position.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "head = [4, 2, 1, 3]",
+            "expected": "[1, 2, 3, 4]",
+            "visualHint": "Maintain dummy head for sorted portion and insert current node into correct position."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Insertion sort on linked lists rearranges node pointers without creating new nodes.',
       timeComplexity: 'O(N²)',
@@ -336,6 +336,7 @@ public:
       { input: 'arr1 = [2,3,1,3,2,4,6,7,9,2,19], arr2 = [2,1,4,3,9,6]', output: '[2,2,2,1,4,3,3,9,6,7,19]' }
     ],
     constraints: ['1 <= arr1.length, arr2.length <= 1000'],
+    functionName: 'relativeSortArray',
     starterCode: {
       'Python': `def relativeSortArray(arr1, arr2):
     # Write your code here
@@ -362,16 +363,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'arr1 = [2,3,1,3,2,4,6,7,9,2,19], arr2 = [2,1,4,3,9,6]',
-        expected: '[2,2,2,1,4,3,3,9,6,7,19]',
-        actual: hasValidCode ? '[2,2,2,1,4,3,3,9,6,7,19]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Use counting sort frequency map up to max element value 1000.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "arr1 = [2,3,1,3,2,4,6,7,9,2,19], arr2 = [2,1,4,3,9,6]",
+            "expected": "[2,2,2,1,4,3,3,9,6,7,19]",
+            "visualHint": "Use counting sort frequency map up to max element value 1000."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Counting sort frequency array allows placing elements in custom arr2 order in linear time.',
       timeComplexity: 'O(N + K log K)',
@@ -398,6 +398,7 @@ public:
       { input: 's = "cccaaa"', output: '"cccaaa"' }
     ],
     constraints: ['1 <= s.length <= 5 * 10^5'],
+    functionName: 'frequencySort',
     starterCode: {
       'Python': `def frequencySort(s):
     # Write your code here
@@ -426,16 +427,15 @@ public:
     return "";
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 's = "tree"',
-        expected: '"eert"',
-        actual: hasValidCode ? '"eert"' : '""',
-        passed: hasValidCode,
-        visualHint: 'Bucket sort by frequency array: buckets[freq] stores characters with that frequency.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "s = \"tree\"",
+            "expected": "\"eert\"",
+            "visualHint": "Bucket sort by frequency array: buckets[freq] stores characters with that frequency."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Bucket sort places characters in buckets indexed by frequency in O(N) time.',
       timeComplexity: 'O(N)',
@@ -462,6 +462,7 @@ public:
       { input: 'nums = [5, 2, 6, 1]', output: '[2, 1, 1, 0]' }
     ],
     constraints: ['1 <= nums.length <= 10^5'],
+    functionName: 'countSmaller',
     starterCode: {
       'Python': `def countSmaller(nums):
     # Write your code here (Modified Merge Sort)
@@ -487,16 +488,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [5, 2, 6, 1]',
-        expected: '[2, 1, 1, 0]',
-        actual: hasValidCode ? '[2, 1, 1, 0]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'During Merge Sort merge step, count how many elements from right half are smaller than left element.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [5, 2, 6, 1]",
+            "expected": "[2, 1, 1, 0]",
+            "visualHint": "During Merge Sort merge step, count how many elements from right half are smaller than left element."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Merge sort tracks inversions. When merging left and right halves, elements moving from right before left are smaller.',
       timeComplexity: 'O(N log N)',

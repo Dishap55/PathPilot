@@ -53,6 +53,7 @@ You may assume that each input would have exactly one solution, and you may not 
       '-10^9 <= target <= 10^9',
       'Only one valid answer exists.'
     ],
+    functionName: 'twoSum',
     starterCode: {
       'Python': `def twoSum(nums, target):
     # Write your code here
@@ -79,24 +80,22 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [2, 7, 11, 15], target = 9',
-        expected: '[0, 1]',
-        actual: hasValidCode ? '[0, 1]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Store complement (target - num) in a hash map as you traverse.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [2, 7, 11, 15], target = 9",
+            "expected": "[0, 1]",
+            "visualHint": "Store complement (target - num) in a hash map as you traverse."
       },
       {
-        id: 2,
-        input: 'nums = [3, 2, 4], target = 6',
-        expected: '[1, 2]',
-        actual: hasValidCode ? '[1, 2]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'For nums[2] = 4, target - 4 = 2, which was previously seen at index 1.'
+            "id": 2,
+            "title": "Test Case 2",
+            "input": "nums = [3, 2, 4], target = 6",
+            "expected": "[1, 2]",
+            "visualHint": "For nums[2] = 4, target - 4 = 2, which was previously seen at index 1."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Instead of searching all pairs in O(N²), store each element in a hash map to check complement presence in O(1) time.',
       timeComplexity: 'O(N) - Single pass through the array.',
@@ -131,6 +130,7 @@ public:
       '1 <= prices.length <= 10^5',
       '0 <= prices[i] <= 10^4'
     ],
+    functionName: 'maxProfit',
     starterCode: {
       'Python': `def maxProfit(prices):
     # Write your code here
@@ -157,16 +157,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'prices = [7, 1, 5, 3, 6, 4]',
-        expected: '5',
-        actual: hasValidCode ? '5' : '0',
-        passed: hasValidCode,
-        visualHint: 'Track minPrice seen so far and calculate prices[i] - minPrice.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "prices = [7, 1, 5, 3, 6, 4]",
+            "expected": "5",
+            "visualHint": "Track minPrice seen so far and calculate prices[i] - minPrice."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Maintain minimum price encountered so far and check potential profit at each step.',
       timeComplexity: 'O(N) - Linear scan.',
@@ -195,6 +194,7 @@ public:
       { input: 'nums = [1, 2, 3, 4]', output: 'false' }
     ],
     constraints: ['1 <= nums.length <= 10^5', '-10^9 <= nums[i] <= 10^9'],
+    functionName: 'containsDuplicate',
     starterCode: {
       'Python': `def containsDuplicate(nums):
     # Write your code here
@@ -221,16 +221,15 @@ public:
     return false;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1, 2, 3, 1]',
-        expected: 'true',
-        actual: hasValidCode ? 'true' : 'false',
-        passed: hasValidCode,
-        visualHint: 'Use a hash set to detect already-seen elements in O(1).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1, 2, 3, 1]",
+            "expected": "true",
+            "visualHint": "Use a hash set to detect already-seen elements in O(1)."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Insert elements into a hash set. If an element already exists in set, return true.',
       timeComplexity: 'O(N) - Single scan.',
@@ -258,6 +257,7 @@ public:
       { input: 'nums = [2, 2, 1, 1, 1, 2, 2]', output: '2' }
     ],
     constraints: ['n == nums.length', '1 <= n <= 5 * 10^4'],
+    functionName: 'majorityElement',
     starterCode: {
       'Python': `def majorityElement(nums):
     # Write your code here
@@ -283,16 +283,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [2, 2, 1, 1, 1, 2, 2]',
-        expected: '2',
-        actual: hasValidCode ? '2' : '0',
-        passed: hasValidCode,
-        visualHint: 'Boyer-Moore Voting Algorithm maintains candidate and count.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [2, 2, 1, 1, 1, 2, 2]",
+            "expected": "2",
+            "visualHint": "Boyer-Moore Voting Algorithm maintains candidate and count."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Boyer-Moore Voting Algorithm cancels out pairs of non-matching elements.',
       timeComplexity: 'O(N) - One pass.',
@@ -318,6 +317,7 @@ public:
       { input: 'nums = [0, 1, 0, 3, 12]', output: '[1, 3, 12, 0, 0]' }
     ],
     constraints: ['1 <= nums.length <= 10^4', '-2^31 <= nums[i] <= 2^31 - 1'],
+    functionName: 'moveZeroes',
     starterCode: {
       'Python': `def moveZeroes(nums):
     # Write your code here (modify nums in-place)
@@ -340,16 +340,15 @@ public:
     // Write your code here
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [0, 1, 0, 3, 12]',
-        expected: '[1, 3, 12, 0, 0]',
-        actual: hasValidCode ? '[1, 3, 12, 0, 0]' : '[0, 1, 0, 3, 12]',
-        passed: hasValidCode,
-        visualHint: 'Use writePointer index to place non-zero elements sequentially.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [0, 1, 0, 3, 12]",
+            "expected": "[1, 3, 12, 0, 0]",
+            "visualHint": "Use writePointer index to place non-zero elements sequentially."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Maintain write index pointing to where next non-zero element should go.',
       timeComplexity: 'O(N)',
@@ -376,6 +375,7 @@ public:
       { input: 'nums = [0, 1]', output: '2' }
     ],
     constraints: ['n == nums.length', '1 <= n <= 10^4'],
+    functionName: 'missingNumber',
     starterCode: {
       'Python': `def missingNumber(nums):
     # Write your code here
@@ -401,16 +401,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [3, 0, 1]',
-        expected: '2',
-        actual: hasValidCode ? '2' : '0',
-        passed: hasValidCode,
-        visualHint: 'Expected sum is n*(n+1)/2. Subtract actual sum of array elements.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [3, 0, 1]",
+            "expected": "2",
+            "visualHint": "Expected sum is n*(n+1)/2. Subtract actual sum of array elements."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Gauss formula gives expected sum from 0 to n. Difference from actual sum yields missing number.',
       timeComplexity: 'O(N)',
@@ -437,6 +436,7 @@ public:
       { input: 'nums = [1, 2, 3, 4]', output: '[1, 3, 6, 10]' }
     ],
     constraints: ['1 <= nums.length <= 1000', '-10^6 <= nums[i] <= 10^6'],
+    functionName: 'runningSum',
     starterCode: {
       'Python': `def runningSum(nums):
     # Write your code here
@@ -462,16 +462,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1, 2, 3, 4]',
-        expected: '[1, 3, 6, 10]',
-        actual: hasValidCode ? '[1, 3, 6, 10]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Accumulate sum in-place: nums[i] += nums[i-1].'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1, 2, 3, 4]",
+            "expected": "[1, 3, 6, 10]",
+            "visualHint": "Accumulate sum in-place: nums[i] += nums[i-1]."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Each running sum element at index i equals runningSum[i-1] + nums[i].',
       timeComplexity: 'O(N)',
@@ -496,6 +495,7 @@ public:
       { input: 'nums = [1, 7, 3, 6, 5, 6]', output: '3' }
     ],
     constraints: ['1 <= nums.length <= 10^4', '-1000 <= nums[i] <= 1000'],
+    functionName: 'pivotIndex',
     starterCode: {
       'Python': `def pivotIndex(nums):
     # Write your code here
@@ -522,16 +522,15 @@ public:
     return -1;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1, 7, 3, 6, 5, 6]',
-        expected: '3',
-        actual: hasValidCode ? '3' : '-1',
-        passed: hasValidCode,
-        visualHint: 'leftSum == totalSum - leftSum - nums[i].'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1, 7, 3, 6, 5, 6]",
+            "expected": "3",
+            "visualHint": "leftSum == totalSum - leftSum - nums[i]."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Compute total array sum. Track leftSum while moving index i.',
       timeComplexity: 'O(N)',
@@ -557,6 +556,7 @@ public:
       { input: 'nums = [4, 1, 2, 1, 2]', output: '4' }
     ],
     constraints: ['1 <= nums.length <= 3 * 10^4'],
+    functionName: 'singleNumber',
     starterCode: {
       'Python': `def singleNumber(nums):
     # Write your code here
@@ -582,16 +582,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [4, 1, 2, 1, 2]',
-        expected: '4',
-        actual: hasValidCode ? '4' : '0',
-        passed: hasValidCode,
-        visualHint: 'XOR property: a ^ a = 0 and a ^ 0 = a.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [4, 1, 2, 1, 2]",
+            "expected": "4",
+            "visualHint": "XOR property: a ^ a = 0 and a ^ 0 = a."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'XORing all numbers cancels out duplicate pairs, leaving the single unique number.',
       timeComplexity: 'O(N)',
@@ -617,6 +616,7 @@ public:
       { input: 'numRows = 5', output: '[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]' }
     ],
     constraints: ['1 <= numRows <= 30'],
+    functionName: 'generate',
     starterCode: {
       'Python': `def generate(numRows):
     # Write your code here
@@ -642,16 +642,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'numRows = 5',
-        expected: '[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]',
-        actual: hasValidCode ? '[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'row[j] = prevRow[j-1] + prevRow[j].'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "numRows = 5",
+            "expected": "[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]",
+            "visualHint": "row[j] = prevRow[j-1] + prevRow[j]."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Build row i by summing adjacent elements from row i-1.',
       timeComplexity: 'O(numRows²)',
@@ -680,6 +679,7 @@ public:
       { input: 'digits = [9, 9]', output: '[1, 0, 0]' }
     ],
     constraints: ['1 <= digits.length <= 100', '0 <= digits[i] <= 9'],
+    functionName: 'plusOne',
     starterCode: {
       'Python': `def plusOne(digits):
     # Write your code here
@@ -705,16 +705,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'digits = [9, 9]',
-        expected: '[1, 0, 0]',
-        actual: hasValidCode ? '[1, 0, 0]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Process from right to left, handling carry over when digit is 9.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "digits = [9, 9]",
+            "expected": "[1, 0, 0]",
+            "visualHint": "Process from right to left, handling carry over when digit is 9."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Traverse backwards. If digit < 9, increment and return. If 9, turn to 0 and carry over.',
       timeComplexity: 'O(N)',
@@ -741,6 +740,7 @@ public:
       { input: 'nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3', output: '[1,2,2,3,5,6]' }
     ],
     constraints: ['nums1.length == m + n', 'nums2.length == n'],
+    functionName: 'merge',
     starterCode: {
       'Python': `def merge(nums1, m, nums2, n):
     # Modify nums1 in-place
@@ -763,16 +763,15 @@ public:
     // Write your code here
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3',
-        expected: '[1,2,2,3,5,6]',
-        actual: hasValidCode ? '[1,2,2,3,5,6]' : '[1,2,3,0,0,0]',
-        passed: hasValidCode,
-        visualHint: 'Fill elements from the back (index m+n-1) to avoid overwriting nums1.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3",
+            "expected": "[1,2,2,3,5,6]",
+            "visualHint": "Fill elements from the back (index m+n-1) to avoid overwriting nums1."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Three pointers starting from the end of arrays allow in-place merge without extra memory.',
       timeComplexity: 'O(m + n)',
@@ -799,6 +798,7 @@ public:
       { input: 'nums1 = [1, 2, 2, 1], nums2 = [2, 2]', output: '[2, 2]' }
     ],
     constraints: ['1 <= nums1.length, nums2.length <= 1000'],
+    functionName: 'intersect',
     starterCode: {
       'Python': `def intersect(nums1, nums2):
     # Write your code here
@@ -825,16 +825,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums1 = [1, 2, 2, 1], nums2 = [2, 2]',
-        expected: '[2, 2]',
-        actual: hasValidCode ? '[2, 2]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Count frequencies of nums1 in hash map, then decrement when matching nums2.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums1 = [1, 2, 2, 1], nums2 = [2, 2]",
+            "expected": "[2, 2]",
+            "visualHint": "Count frequencies of nums1 in hash map, then decrement when matching nums2."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Store element counts of the smaller array in a frequency map.',
       timeComplexity: 'O(N + M)',
@@ -860,6 +859,7 @@ public:
       { input: 'matrix = [[1,2,3],[4,5,6],[7,8,9]]', output: '[[7,4,1],[8,5,2],[9,6,3]]' }
     ],
     constraints: ['n == matrix.length == matrix[i].length', '1 <= n <= 20'],
+    functionName: 'rotate',
     starterCode: {
       'Python': `def rotate(matrix):
     # Rotate matrix in-place
@@ -883,16 +883,15 @@ public:
     // Write your code here
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'matrix = [[1,2,3],[4,5,6],[7,8,9]]',
-        expected: '[[7,4,1],[8,5,2],[9,6,3]]',
-        actual: hasValidCode ? '[[7,4,1],[8,5,2],[9,6,3]]' : '[[1,2,3],[4,5,6],[7,8,9]]',
-        passed: hasValidCode,
-        visualHint: 'Step 1: Transpose matrix (swap matrix[i][j] with matrix[j][i]). Step 2: Reverse each row.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "matrix = [[1,2,3],[4,5,6],[7,8,9]]",
+            "expected": "[[7,4,1],[8,5,2],[9,6,3]]",
+            "visualHint": "Step 1: Transpose matrix (swap matrix[i][j] with matrix[j][i]). Step 2: Reverse each row."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Rotate 90 degrees clockwise = Transpose matrix + Reverse every row.',
       timeComplexity: 'O(N²)',
@@ -921,6 +920,7 @@ public:
       { input: 'nums = [-2,1,-3,4,-1,2,1,-5,4]', output: '6', explanation: 'Subarray [4,-1,2,1] has the largest sum 6.' }
     ],
     constraints: ['1 <= nums.length <= 10^5', '-10^4 <= nums[i] <= 10^4'],
+    functionName: 'maxSubArray',
     starterCode: {
       'Python': `def maxSubArray(nums):
     # Write your code here
@@ -947,16 +947,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [-2,1,-3,4,-1,2,1,-5,4]',
-        expected: '6',
-        actual: hasValidCode ? '6' : '0',
-        passed: hasValidCode,
-        visualHint: 'currentSum = max(num, currentSum + num). Update maxSum at each step.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [-2,1,-3,4,-1,2,1,-5,4]",
+            "expected": "6",
+            "visualHint": "currentSum = max(num, currentSum + num). Update maxSum at each step."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'If current cumulative subarray sum becomes negative, reset it to 0 as it hurts future sum.',
       timeComplexity: 'O(N)',
@@ -982,6 +981,7 @@ public:
       { input: 'nums = [1, 2, 3, 4]', output: '[24, 12, 8, 6]' }
     ],
     constraints: ['2 <= nums.length <= 10^5', '-30 <= nums[i] <= 30'],
+    functionName: 'productExceptSelf',
     starterCode: {
       'Python': `def productExceptSelf(nums):
     # Write your code here
@@ -1007,16 +1007,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1, 2, 3, 4]',
-        expected: '[24, 12, 8, 6]',
-        actual: hasValidCode ? '[24, 12, 8, 6]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'res[i] = prefixProduct[i-1] * suffixProduct[i+1].'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1, 2, 3, 4]",
+            "expected": "[24, 12, 8, 6]",
+            "visualHint": "res[i] = prefixProduct[i-1] * suffixProduct[i+1]."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Compute left products in a single pass, then multiply right products in a reverse pass.',
       timeComplexity: 'O(N)',
@@ -1043,6 +1042,7 @@ public:
       { input: 'nums = [1, 2, 3], k = 3', output: '2' }
     ],
     constraints: ['1 <= nums.length <= 2 * 10^4', '-1000 <= nums[i] <= 1000'],
+    functionName: 'subarraySum',
     starterCode: {
       'Python': `def subarraySum(nums, k):
     # Write your code here
@@ -1069,16 +1069,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1, 1, 1], k = 2',
-        expected: '2',
-        actual: hasValidCode ? '2' : '0',
-        passed: hasValidCode,
-        visualHint: 'Store frequencies of prefix sums in hash map. Check map[currSum - k].'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1, 1, 1], k = 2",
+            "expected": "2",
+            "visualHint": "Store frequencies of prefix sums in hash map. Check map[currSum - k]."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Subarray sum between index i and j is prefixSum[j] - prefixSum[i-1]. If prefixSum[j] - prefixSum[i-1] == k, prefixSum[i-1] == prefixSum[j] - k.',
       timeComplexity: 'O(N)',
@@ -1106,6 +1105,7 @@ public:
       { input: 'matrix = [[1,2,3],[4,5,6],[7,8,9]]', output: '[1,2,3,6,9,8,7,4,5]' }
     ],
     constraints: ['m == matrix.length', 'n == matrix[i].length', '1 <= m, n <= 10'],
+    functionName: 'spiralOrder',
     starterCode: {
       'Python': `def spiralOrder(matrix):
     # Write your code here
@@ -1131,16 +1131,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'matrix = [[1,2,3],[4,5,6],[7,8,9]]',
-        expected: '[1,2,3,6,9,8,7,4,5]',
-        actual: hasValidCode ? '[1,2,3,6,9,8,7,4,5]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Maintain 4 pointers: top, bottom, left, right.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "matrix = [[1,2,3],[4,5,6],[7,8,9]]",
+            "expected": "[1,2,3,6,9,8,7,4,5]",
+            "visualHint": "Maintain 4 pointers: top, bottom, left, right."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Shrink matrix boundaries after traversing top row, right col, bottom row, left col.',
       timeComplexity: 'O(M * N)',
@@ -1169,6 +1168,7 @@ public:
       { input: 'nums = [3, 2, 1]', output: '[1, 2, 3]' }
     ],
     constraints: ['1 <= nums.length <= 100'],
+    functionName: 'nextPermutation',
     starterCode: {
       'Python': `def nextPermutation(nums):
     # Modify nums in-place
@@ -1192,16 +1192,15 @@ public:
     // Write your code here
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1, 2, 3]',
-        expected: '[1, 3, 2]',
-        actual: hasValidCode ? '[1, 3, 2]' : '[1, 2, 3]',
-        passed: hasValidCode,
-        visualHint: '1. Find rightmost i where nums[i] < nums[i+1]. 2. Swap with smallest element greater than nums[i] on right. 3. Reverse suffix.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1, 2, 3]",
+            "expected": "[1, 3, 2]",
+            "visualHint": "1. Find rightmost i where nums[i] < nums[i+1]. 2. Swap with smallest element greater than nums[i] on right. 3. Reverse suffix."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Identify pivot point from right where order decreases, swap with next larger element, reverse remaining suffix.',
       timeComplexity: 'O(N)',
@@ -1227,6 +1226,7 @@ public:
       { input: 'nums = [1,2,3,4,5,6,7], k = 3', output: '[5,6,7,1,2,3,4]' }
     ],
     constraints: ['1 <= nums.length <= 10^5', '0 <= k <= 10^5'],
+    functionName: 'rotate',
     starterCode: {
       'Python': `def rotate(nums, k):
     # Modify nums in-place
@@ -1250,16 +1250,15 @@ public:
     // Write your code here
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1,2,3,4,5,6,7], k = 3',
-        expected: '[5,6,7,1,2,3,4]',
-        actual: hasValidCode ? '[5,6,7,1,2,3,4]' : '[1,2,3,4,5,6,7]',
-        passed: hasValidCode,
-        visualHint: 'Reverse whole array, reverse first k elements, reverse remaining n-k elements.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1,2,3,4,5,6,7], k = 3",
+            "expected": "[5,6,7,1,2,3,4]",
+            "visualHint": "Reverse whole array, reverse first k elements, reverse remaining n-k elements."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: '3-Reverse technique rotates array in-place without auxiliary memory.',
       timeComplexity: 'O(N)',
@@ -1286,6 +1285,7 @@ public:
       { input: 'matrix = [[1,1,1],[1,0,1],[1,1,1]]', output: '[[1,0,1],[0,0,0],[1,0,1]]' }
     ],
     constraints: ['m == matrix.length', 'n == matrix[0].length', '1 <= m, n <= 200'],
+    functionName: 'setZeroes',
     starterCode: {
       'Python': `def setZeroes(matrix):
     # Modify matrix in-place
@@ -1308,16 +1308,15 @@ public:
     // Write your code here
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'matrix = [[1,1,1],[1,0,1],[1,1,1]]',
-        expected: '[[1,0,1],[0,0,0],[1,0,1]]',
-        actual: hasValidCode ? '[[1,0,1],[0,0,0],[1,0,1]]' : '[[1,1,1],[1,0,1],[1,1,1]]',
-        passed: hasValidCode,
-        visualHint: 'Use row 0 and col 0 as flags. Use col0 flag for column 0.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "matrix = [[1,1,1],[1,0,1],[1,1,1]]",
+            "expected": "[[1,0,1],[0,0,0],[1,0,1]]",
+            "visualHint": "Use row 0 and col 0 as flags. Use col0 flag for column 0."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Store zero row and col markers directly inside first row and column of matrix.',
       timeComplexity: 'O(M * N)',
@@ -1343,6 +1342,7 @@ public:
       { input: 'board = [[0,1,0],[0,0,1],[1,1,1],[0,0,0]]', output: '[[0,0,0],[1,0,1],[0,1,1],[0,1,0]]' }
     ],
     constraints: ['m == board.length', 'n == board[i].length'],
+    functionName: 'gameOfLife',
     starterCode: {
       'Python': `def gameOfLife(board):
     # Modify board in-place
@@ -1365,16 +1365,15 @@ public:
     // Write your code here
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'board = [[0,1,0],[0,0,1],[1,1,1],[0,0,0]]',
-        expected: '[[0,0,0],[1,0,1],[0,1,1],[0,1,0]]',
-        actual: hasValidCode ? '[[0,0,0],[1,0,1],[0,1,1],[0,1,0]]' : '[[0,1,0],[0,0,1],[1,1,1],[0,0,0]]',
-        passed: hasValidCode,
-        visualHint: 'Use 2-bit state encoding (e.g. 2 for live->dead, 3 for dead->live).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "board = [[0,1,0],[0,0,1],[1,1,1],[0,0,0]]",
+            "expected": "[[0,0,0],[1,0,1],[0,1,1],[0,1,0]]",
+            "visualHint": "Use 2-bit state encoding (e.g. 2 for live->dead, 3 for dead->live)."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Encode state transitions into intermediate integers so current round neighbor checks are preserved.',
       timeComplexity: 'O(M * N)',
@@ -1401,6 +1400,7 @@ public:
       { input: 'nums = [2, 3, -2, 4]', output: '6' }
     ],
     constraints: ['1 <= nums.length <= 2 * 10^4', '-10 <= nums[i] <= 10'],
+    functionName: 'maxProduct',
     starterCode: {
       'Python': `def maxProduct(nums):
     # Write your code here
@@ -1427,16 +1427,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [2, 3, -2, 4]',
-        expected: '6',
-        actual: hasValidCode ? '6' : '0',
-        passed: hasValidCode,
-        visualHint: 'Track both maxProduct and minProduct since negative numbers can swap them.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [2, 3, -2, 4]",
+            "expected": "6",
+            "visualHint": "Track both maxProduct and minProduct since negative numbers can swap them."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Multiplying by a negative number swaps maximum product and minimum product.',
       timeComplexity: 'O(N)',
@@ -1466,6 +1465,7 @@ public:
       { input: 'board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"', output: 'true' }
     ],
     constraints: ['m == board.length', 'n == board[i].length'],
+    functionName: 'exist',
     starterCode: {
       'Python': `def exist(board, word):
     # Write your code here
@@ -1492,16 +1492,15 @@ public:
     return false;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"',
-        expected: 'true',
-        actual: hasValidCode ? 'true' : 'false',
-        passed: hasValidCode,
-        visualHint: 'Backtracking DFS: mark current cell visited with `#`, restore after DFS.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "board = [[\"A\",\"B\",\"C\",\"E\"],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]], word = \"ABCCED\"",
+            "expected": "true",
+            "visualHint": "Backtracking DFS: mark current cell visited with `#`, restore after DFS."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Depth-first search with backtracking from each matching starting character.',
       timeComplexity: 'O(M * N * 4^L)',
@@ -1527,6 +1526,7 @@ public:
       { input: 'height = [1,8,6,2,5,4,8,3,7]', output: '49' }
     ],
     constraints: ['n == height.length', '2 <= n <= 10^5'],
+    functionName: 'maxArea',
     starterCode: {
       'Python': `def maxArea(height):
     # Write your code here
@@ -1553,16 +1553,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'height = [1,8,6,2,5,4,8,3,7]',
-        expected: '49',
-        actual: hasValidCode ? '49' : '0',
-        passed: hasValidCode,
-        visualHint: 'Pointers start at boundaries. Move the pointer with smaller height inward.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "height = [1,8,6,2,5,4,8,3,7]",
+            "expected": "49",
+            "visualHint": "Pointers start at boundaries. Move the pointer with smaller height inward."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Area = (right - left) * min(h[left], h[right]). Moving shorter height gives chance of larger area.',
       timeComplexity: 'O(N)',
@@ -1591,6 +1590,7 @@ public:
       { input: 'insert(1), remove(2), insert(2), getRandom(), remove(1), insert(2), getRandom()', output: 'true, false, true, 2, true, false, 2' }
     ],
     constraints: ['-2^31 <= val <= 2^31 - 1'],
+    functionName: '__init__',
     starterCode: {
       'Python': `class RandomizedSet:
     def __init__(self):
@@ -1626,16 +1626,15 @@ public:
     getRandom() { return 0; }
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'RandomizedSet execution',
-        expected: 'O(1) average operations',
-        actual: hasValidCode ? 'O(1) average operations' : 'Failed',
-        passed: hasValidCode,
-        visualHint: 'Combine a dynamic array for O(1) random access with a hash map storing indices for O(1) deletions.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "RandomizedSet execution",
+            "expected": "O(1) average operations",
+            "visualHint": "Combine a dynamic array for O(1) random access with a hash map storing indices for O(1) deletions."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Array provides O(1) random access. Hash map provides O(1) index lookup. Swap target with last array element to remove in O(1).',
       timeComplexity: 'O(1) average',
@@ -1663,6 +1662,7 @@ public:
       { input: 'nums = [4, 2, 1]', output: 'false' }
     ],
     constraints: ['n == nums.length', '1 <= n <= 10^4'],
+    functionName: 'checkPossibility',
     starterCode: {
       'Python': `def checkPossibility(nums):
     # Write your code here
@@ -1688,16 +1688,15 @@ public:
     return false;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [4, 2, 3]',
-        expected: 'true',
-        actual: hasValidCode ? 'true' : 'false',
-        passed: hasValidCode,
-        visualHint: 'If nums[i] > nums[i+1], change nums[i] to nums[i+1] if possible, else change nums[i+1] to nums[i]. Track count <= 1.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [4, 2, 3]",
+            "expected": "true",
+            "visualHint": "If nums[i] > nums[i+1], change nums[i] to nums[i+1] if possible, else change nums[i+1] to nums[i]. Track count <= 1."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Greedily lower nums[i] if nums[i-1] <= nums[i+1], else raise nums[i+1].',
       timeComplexity: 'O(N)',
@@ -1726,6 +1725,7 @@ public:
       { input: 'nums = [3, 4, -1, 1]', output: '2' }
     ],
     constraints: ['1 <= nums.length <= 10^5', '-2^31 <= nums[i] <= 2^31 - 1'],
+    functionName: 'firstMissingPositive',
     starterCode: {
       'Python': `def firstMissingPositive(nums):
     # Write your code here
@@ -1752,16 +1752,15 @@ public:
     return 1;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [3, 4, -1, 1]',
-        expected: '2',
-        actual: hasValidCode ? '2' : '1',
-        passed: hasValidCode,
-        visualHint: 'Cyclic Sort: put number x at index x-1 if 1 <= x <= N.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [3, 4, -1, 1]",
+            "expected": "2",
+            "visualHint": "Cyclic Sort: put number x at index x-1 if 1 <= x <= N."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Use index as hash key. Place element v at index v-1 via cyclic swaps.',
       timeComplexity: 'O(N)',
@@ -1787,6 +1786,7 @@ public:
       { input: 'height = [0,1,0,2,1,0,1,3,2,1,2,1]', output: '6' }
     ],
     constraints: ['n == height.length', '1 <= n <= 2 * 10^4'],
+    functionName: 'trap',
     starterCode: {
       'Python': `def trap(height):
     # Write your code here
@@ -1813,16 +1813,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'height = [0,1,0,2,1,0,1,3,2,1,2,1]',
-        expected: '6',
-        actual: hasValidCode ? '6' : '0',
-        passed: hasValidCode,
-        visualHint: 'Maintain leftMax and rightMax using two pointers.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "height = [0,1,0,2,1,0,1,3,2,1,2,1]",
+            "expected": "6",
+            "visualHint": "Maintain leftMax and rightMax using two pointers."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Water trapped at position i = min(maxLeft, maxRight) - height[i].',
       timeComplexity: 'O(N)',
@@ -1854,6 +1853,7 @@ public:
       { input: 'heights = [2,1,5,6,2,3]', output: '10' }
     ],
     constraints: ['1 <= heights.length <= 10^5'],
+    functionName: 'largestRectangleArea',
     starterCode: {
       'Python': `def largestRectangleArea(heights):
     # Write your code here
@@ -1881,16 +1881,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'heights = [2,1,5,6,2,3]',
-        expected: '10',
-        actual: hasValidCode ? '10' : '0',
-        passed: hasValidCode,
-        visualHint: 'Use monotonic stack storing indices of strictly increasing heights.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "heights = [2,1,5,6,2,3]",
+            "expected": "10",
+            "visualHint": "Use monotonic stack storing indices of strictly increasing heights."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'A monotonic increasing stack finds the left and right boundaries for every bar height.',
       timeComplexity: 'O(N)',
@@ -1918,6 +1917,7 @@ public:
       { input: 'matrix = [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]', output: '6' }
     ],
     constraints: ['rows == matrix.length', 'cols == matrix[0].length'],
+    functionName: 'maximalRectangle',
     starterCode: {
       'Python': `def maximalRectangle(matrix):
     # Write your code here
@@ -1945,16 +1945,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'matrix 5x4 binary grid',
-        expected: '6',
-        actual: hasValidCode ? '6' : '0',
-        passed: hasValidCode,
-        visualHint: 'Convert each row into a histogram height array, then run Largest Rectangle in Histogram algorithm.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "matrix 5x4 binary grid",
+            "expected": "6",
+            "visualHint": "Convert each row into a histogram height array, then run Largest Rectangle in Histogram algorithm."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Cumulative row heights reduce the 2D problem into N calls of 1D Largest Rectangle in Histogram.',
       timeComplexity: 'O(R * C)',
@@ -1981,6 +1980,7 @@ public:
       { input: 'nums = [1,3,-1,-3,5,3,6,7], k = 3', output: '[3,3,5,5,6,7]' }
     ],
     constraints: ['1 <= nums.length <= 10^5', '1 <= k <= nums.length'],
+    functionName: 'maxSlidingWindow',
     starterCode: {
       'Python': `def maxSlidingWindow(nums, k):
     # Write your code here
@@ -2007,16 +2007,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1,3,-1,-3,5,3,6,7], k = 3',
-        expected: '[3,3,5,5,6,7]',
-        actual: hasValidCode ? '[3,3,5,5,6,7]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Monotonic Deque: store indices of elements in decreasing order of values.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1,3,-1,-3,5,3,6,7], k = 3",
+            "expected": "[3,3,5,5,6,7]",
+            "visualHint": "Monotonic Deque: store indices of elements in decreasing order of values."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Double-ended queue (deque) maintains potential maximum elements in monotonic decreasing order.',
       timeComplexity: 'O(N)',
@@ -2044,6 +2043,7 @@ public:
       { input: 's = "ADOBECODEBANC", t = "ABC"', output: '"BANC"' }
     ],
     constraints: ['1 <= s.length, t.length <= 10^5'],
+    functionName: 'minWindow',
     starterCode: {
       'Python': `def minWindow(s, t):
     # Write your code here
@@ -2070,16 +2070,15 @@ public:
     return "";
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 's = "ADOBECODEBANC", t = "ABC"',
-        expected: '"BANC"',
-        actual: hasValidCode ? '"BANC"' : '""',
-        passed: hasValidCode,
-        visualHint: 'Expand right boundary to satisfy frequencies, shrink left boundary to find minimal window.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "s = \"ADOBECODEBANC\", t = \"ABC\"",
+            "expected": "\"BANC\"",
+            "visualHint": "Expand right boundary to satisfy frequencies, shrink left boundary to find minimal window."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Sliding window with frequency counter and required count tracker.',
       timeComplexity: 'O(N + M)',
@@ -2107,6 +2106,7 @@ public:
       { input: 'nums = [1,2]', output: '[1,2]' }
     ],
     constraints: ['1 <= nums.length <= 5 * 10^4'],
+    functionName: 'majorityElement',
     starterCode: {
       'Python': `def majorityElement(nums):
     # Write your code here
@@ -2132,16 +2132,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [3,2,3]',
-        expected: '[3]',
-        actual: hasValidCode ? '[3]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Boyer-Moore Voting algorithm extended for at most 2 candidates.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [3,2,3]",
+            "expected": "[3]",
+            "visualHint": "Boyer-Moore Voting algorithm extended for at most 2 candidates."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'There can be at most two elements appearing more than n/3 times.',
       timeComplexity: 'O(N)',
@@ -2168,6 +2167,7 @@ public:
       { input: 'nums = [4,3,2,7,8,2,3,1]', output: '[2, 3]' }
     ],
     constraints: ['n == nums.length', '1 <= n <= 10^5'],
+    functionName: 'findDuplicates',
     starterCode: {
       'Python': `def findDuplicates(nums):
     # Write your code here
@@ -2194,16 +2194,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [4,3,2,7,8,2,3,1]',
-        expected: '[2, 3]',
-        actual: hasValidCode ? '[2, 3]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Negate value at index abs(val)-1. If already negative, val is a duplicate.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [4,3,2,7,8,2,3,1]",
+            "expected": "[2, 3]",
+            "visualHint": "Negate value at index abs(val)-1. If already negative, val is a duplicate."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Use sign of elements at index abs(num)-1 as a visit flag.',
       timeComplexity: 'O(N)',

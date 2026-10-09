@@ -231,7 +231,7 @@ export default function InitialAssessment() {
       setTimeout(() => {
         setFeedback(null);
         setIsSubmitting(false);
-      }, 1000);
+      }, 250);
     } catch (err) {
       setErrorMessage(err.message || 'Error processing response.');
       setIsSubmitting(false);
@@ -258,7 +258,7 @@ export default function InitialAssessment() {
       setTimeout(() => {
         setFeedback(null);
         setIsSubmitting(false);
-      }, 1000);
+      }, 200);
     } catch (err) {
       setErrorMessage(err.message || 'Error skipping question.');
       setIsSubmitting(false);

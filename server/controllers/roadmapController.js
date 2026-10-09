@@ -97,7 +97,29 @@ module.exports = {
 
   submitAttempt: async (req, res, next) => {
     try {
-      const { question_type, selected_option } = req.body;
+      const { question_type, selected_option, code, language } = req.body;
+
+      if (question_type === 'coding') {
+        const execResult = await codeExecutionService.runCode(code, language || 'cpp');
+        const isCorrect = Boolean(execResult?.passed || execResult?.status?.id === 3);
+        return sendSuccess(res, {
+          evaluation: {
+            is_correct: isCorrect,
+            status: execResult?.status?.description || (isCorrect ? 'Accepted' : 'Wrong Answer'),
+            stdout: execResult?.stdout || execResult?.stderr,
+            score: isCorrect ? 100 : 0,
+            feedback: isCorrect
+              ? 'All test cases passed successfully!'
+              : (execResult?.stderr || 'Test cases verification failed: output mismatch or syntax issue.')
+          },
+          progress: {
+            completed_questions: isCorrect ? 3 : 2,
+            total_questions: 3,
+            percent: isCorrect ? 100 : 66
+          }
+        });
+      }
+
       const isCorrect = selected_option === 1;
       return sendSuccess(res, {
         evaluation: {

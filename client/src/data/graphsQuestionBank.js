@@ -32,6 +32,7 @@ export const GRAPHS_QUESTION_BANK = [
       { input: 'edges = [[1,2],[2,3],[4,2]]', output: '2' }
     ],
     constraints: ['3 <= n <= 10^5', 'edges.length == n - 1'],
+    functionName: 'findCenter',
     starterCode: {
       'Python': `def findCenter(edges):
     # Write your code here
@@ -57,16 +58,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'edges = [[1,2],[2,3],[4,2]]',
-        expected: '2',
-        actual: hasValidCode ? '2' : '0',
-        passed: hasValidCode,
-        visualHint: 'The center node must appear in both edges[0] and edges[1].'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "edges = [[1,2],[2,3],[4,2]]",
+            "expected": "2",
+            "visualHint": "The center node must appear in both edges[0] and edges[1]."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Center node connects to all other nodes, so it must be present in the first two edges.',
       timeComplexity: 'O(1)',
@@ -91,6 +91,7 @@ public:
       { input: 'grid = [["1","1","1","1","0"],["1","1","0","1","0"],["1","1","0","0","0"],["0","0","0","0","0"]]', output: '1' }
     ],
     constraints: ['m == grid.length', 'n == grid[i].length', '1 <= m, n <= 300'],
+    functionName: 'numIslands',
     starterCode: {
       'Python': `def numIslands(grid):
     # Write your code here
@@ -116,16 +117,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'grid = 4x5 binary land grid',
-        expected: '1',
-        actual: hasValidCode ? '1' : '0',
-        passed: hasValidCode,
-        visualHint: 'Iterate grid cells. When grid[r][c] == "1", increment island count and sink island using DFS.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "grid = 4x5 binary land grid",
+            "expected": "1",
+            "visualHint": "Iterate grid cells. When grid[r][c] == \"1\", increment island count and sink island using DFS."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Each unvisited "1" triggers a DFS flood fill that marks all connected land cells as visited ("0").',
       timeComplexity: 'O(M * N)',
@@ -154,6 +154,7 @@ public:
       { input: 'adjList = [[2,4],[1,3],[2,4],[1,3]]', output: '[[2,4],[1,3],[2,4],[1,3]]' }
     ],
     constraints: ['Number of nodes in graph is in range [0, 100]'],
+    functionName: 'cloneGraph',
     starterCode: {
       'Python': `def cloneGraph(node):
     # Write your code here
@@ -179,16 +180,15 @@ public:
     return null;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'adjList = [[2,4],[1,3],[2,4],[1,3]]',
-        expected: 'Cloned deep copy',
-        actual: hasValidCode ? 'Cloned deep copy' : 'null',
-        passed: hasValidCode,
-        visualHint: 'Use hash map oldNode -> clonedNode to store visited nodes during DFS traversal.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "adjList = [[2,4],[1,3],[2,4],[1,3]]",
+            "expected": "Cloned deep copy",
+            "visualHint": "Use hash map oldNode -> clonedNode to store visited nodes during DFS traversal."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Hash map maps original nodes to new cloned nodes to handle cycles during graph traversal.',
       timeComplexity: 'O(V + E)',
@@ -217,6 +217,7 @@ public:
       { input: 'numCourses = 2, prerequisites = [[1,0],[0,1]]', output: 'false' }
     ],
     constraints: ['1 <= numCourses <= 2000'],
+    functionName: 'canFinish',
     starterCode: {
       'Python': `def canFinish(numCourses, prerequisites):
     # Write your code here (Kahn's BFS or DFS Cycle Detection)
@@ -243,16 +244,15 @@ public:
     return false;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'numCourses = 2, prerequisites = [[1,0]]',
-        expected: 'true',
-        actual: hasValidCode ? 'true' : 'false',
-        passed: hasValidCode,
-        visualHint: 'Kahn\'s Algorithm: compute in-degrees of all nodes. Nodes with in-degree 0 are ready to take.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "numCourses = 2, prerequisites = [[1,0]]",
+            "expected": "true",
+            "visualHint": "Kahn's Algorithm: compute in-degrees of all nodes. Nodes with in-degree 0 are ready to take."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'A valid schedule exists if and only if the dependency graph is a Directed Acyclic Graph (DAG).',
       timeComplexity: 'O(V + E)',
@@ -279,6 +279,7 @@ public:
       { input: 'times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2', output: '2' }
     ],
     constraints: ['1 <= k <= n <= 100'],
+    functionName: 'networkDelayTime',
     starterCode: {
       'Python': `def networkDelayTime(times, n, k):
     # Write your code here (Dijkstra's Algorithm)
@@ -305,16 +306,15 @@ public:
     return -1;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2',
-        expected: '2',
-        actual: hasValidCode ? '2' : '-1',
-        passed: hasValidCode,
-        visualHint: 'Dijkstra\'s algorithm with Min-Heap tracks shortest distance from source node k to all other nodes.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2",
+            "expected": "2",
+            "visualHint": "Dijkstra's algorithm with Min-Heap tracks shortest distance from source node k to all other nodes."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Dijkstra computes single-source shortest paths on weighted directed graphs with non-negative weights.',
       timeComplexity: 'O(E log V)',
@@ -342,6 +342,7 @@ public:
       { input: 'beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]', output: '5' }
     ],
     constraints: ['1 <= beginWord.length <= 10'],
+    functionName: 'ladderLength',
     starterCode: {
       'Python': `def ladderLength(beginWord, endWord, wordList):
     # Write your code here (BFS)
@@ -370,16 +371,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'beginWord = "hit", endWord = "cog"',
-        expected: '5',
-        actual: hasValidCode ? '5' : '0',
-        passed: hasValidCode,
-        visualHint: 'BFS on word state space guarantees finding the shortest transformation length.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "beginWord = \"hit\", endWord = \"cog\"",
+            "expected": "5",
+            "visualHint": "BFS on word state space guarantees finding the shortest transformation length."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Unweighted state graph shortest path is optimally solved using Queue-based BFS.',
       timeComplexity: 'O(N * M²)',

@@ -32,6 +32,7 @@ export const LINKED_LIST_QUESTION_BANK = [
       { input: 'head = [1, 2, 3, 4, 5]', output: '[5, 4, 3, 2, 1]' }
     ],
     constraints: ['Number of nodes in list is in range [0, 5000]', '-5000 <= Node.val <= 5000'],
+    functionName: 'reverseList',
     starterCode: {
       'Python': `def reverseList(head):
     # Write your code here
@@ -54,16 +55,15 @@ public:
     return null;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'head = [1, 2, 3, 4, 5]',
-        expected: '[5, 4, 3, 2, 1]',
-        actual: hasValidCode ? '[5, 4, 3, 2, 1]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Maintain prev=null, curr=head, nextNode=curr.next. Reverse curr.next = prev.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "head = [1, 2, 3, 4, 5]",
+            "expected": "[5, 4, 3, 2, 1]",
+            "visualHint": "Maintain prev=null, curr=head, nextNode=curr.next. Reverse curr.next = prev."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Change pointer directions in a single pass maintaining prev, curr, and next pointers.',
       timeComplexity: 'O(N)',
@@ -93,6 +93,7 @@ public:
       { input: 'head = [3, 2, 0, -4], pos = 1', output: 'true' }
     ],
     constraints: ['Number of nodes in list is in range [0, 10^4]'],
+    functionName: 'hasCycle',
     starterCode: {
       'Python': `def hasCycle(head):
     # Write your code here
@@ -115,16 +116,15 @@ public:
     return false;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'head = [3, 2, 0, -4], pos = 1',
-        expected: 'true',
-        actual: hasValidCode ? 'true' : 'false',
-        passed: hasValidCode,
-        visualHint: 'Floyd\'s Cycle Finding Algorithm: slow moves 1 step, fast moves 2 steps. If fast == slow, cycle exists.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "head = [3, 2, 0, -4], pos = 1",
+            "expected": "true",
+            "visualHint": "Floyd's Cycle Finding Algorithm: slow moves 1 step, fast moves 2 steps. If fast == slow, cycle exists."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Fast pointer moves twice as fast as slow pointer. If a cycle exists, fast will catch up to slow inside the loop.',
       timeComplexity: 'O(N)',
@@ -153,6 +153,7 @@ public:
       { input: 'list1 = [1, 2, 4], list2 = [1, 3, 4]', output: '[1, 1, 2, 3, 4, 4]' }
     ],
     constraints: ['Number of nodes in both lists is in range [0, 50]'],
+    functionName: 'mergeTwoLists',
     starterCode: {
       'Python': `def mergeTwoLists(list1, list2):
     # Write your code here
@@ -175,16 +176,15 @@ public:
     return null;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'list1 = [1, 2, 4], list2 = [1, 3, 4]',
-        expected: '[1, 1, 2, 3, 4, 4]',
-        actual: hasValidCode ? '[1, 1, 2, 3, 4, 4]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Use dummy head node. Attach smaller node of list1 or list2 at each iteration.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "list1 = [1, 2, 4], list2 = [1, 3, 4]",
+            "expected": "[1, 1, 2, 3, 4, 4]",
+            "visualHint": "Use dummy head node. Attach smaller node of list1 or list2 at each iteration."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Compare front values of both lists and attach smaller node to tail of merged list.',
       timeComplexity: 'O(N + M)',
@@ -215,6 +215,7 @@ public:
       { input: 'head = [1, 2, 3, 4, 5, 6]', output: '[4, 5, 6]' }
     ],
     constraints: ['Number of nodes in list is in range [1, 100]'],
+    functionName: 'middleNode',
     starterCode: {
       'Python': `def middleNode(head):
     # Write your code here
@@ -237,16 +238,15 @@ public:
     return null;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'head = [1, 2, 3, 4, 5]',
-        expected: '[3, 4, 5]',
-        actual: hasValidCode ? '[3, 4, 5]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'When fast pointer reaches end (moves 2 steps), slow pointer (moves 1 step) sits at middle.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "head = [1, 2, 3, 4, 5]",
+            "expected": "[3, 4, 5]",
+            "visualHint": "When fast pointer reaches end (moves 2 steps), slow pointer (moves 1 step) sits at middle."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Fast pointer advances 2 steps while slow advances 1 step. When fast reaches end, slow is at middle.',
       timeComplexity: 'O(N)',
@@ -274,6 +274,7 @@ public:
       { input: 'head = [1, 2, 3, 4, 5], n = 2', output: '[1, 2, 3, 5]' }
     ],
     constraints: ['Number of nodes in list is in range [1, 30]'],
+    functionName: 'removeNthFromEnd',
     starterCode: {
       'Python': `def removeNthFromEnd(head, n):
     # Write your code here
@@ -296,16 +297,15 @@ public:
     return null;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'head = [1, 2, 3, 4, 5], n = 2',
-        expected: '[1, 2, 3, 5]',
-        actual: hasValidCode ? '[1, 2, 3, 5]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Advance fast pointer n+1 steps ahead of slow pointer. When fast reaches null, slow is right before target node.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "head = [1, 2, 3, 4, 5], n = 2",
+            "expected": "[1, 2, 3, 5]",
+            "visualHint": "Advance fast pointer n+1 steps ahead of slow pointer. When fast reaches null, slow is right before target node."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Maintain a gap of N nodes between fast and slow pointers using a dummy node.',
       timeComplexity: 'O(N)',
@@ -334,6 +334,7 @@ public:
       { input: 'head = [1, 2, 3, 4]', output: '[1, 4, 2, 3]' }
     ],
     constraints: ['Number of nodes in list is in range [1, 5 * 10^4]'],
+    functionName: 'reorderList',
     starterCode: {
       'Python': `def reorderList(head):
     # Modify list in-place
@@ -353,16 +354,15 @@ public:
     // Write your code here
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'head = [1, 2, 3, 4]',
-        expected: '[1, 4, 2, 3]',
-        actual: hasValidCode ? '[1, 4, 2, 3]' : '[1, 2, 3, 4]',
-        passed: hasValidCode,
-        visualHint: 'Step 1: Find middle using fast/slow. Step 2: Reverse second half. Step 3: Interleave two halves.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "head = [1, 2, 3, 4]",
+            "expected": "[1, 4, 2, 3]",
+            "visualHint": "Step 1: Find middle using fast/slow. Step 2: Reverse second half. Step 3: Interleave two halves."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Combines middle finding, list reversal, and two-pointer merging.',
       timeComplexity: 'O(N)',
@@ -388,6 +388,7 @@ public:
       { input: 'head = [1,2,3,4,5,6,null,null,null,7,8,9,10,null,null,11,12]', output: '[1,2,3,7,8,11,12,9,10,4,5,6]' }
     ],
     constraints: ['Number of nodes in list is in range [0, 1000]'],
+    functionName: 'flatten',
     starterCode: {
       'Python': `def flatten(head):
     # Write your code here
@@ -410,16 +411,15 @@ public:
     return null;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'Multilevel doubly linked list',
-        expected: 'Flattened 1D doubly list',
-        actual: hasValidCode ? 'Flattened 1D doubly list' : 'Failed',
-        passed: hasValidCode,
-        visualHint: 'When child pointer exists, insert child list between curr and curr.next using stack or DFS.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "Multilevel doubly linked list",
+            "expected": "Flattened 1D doubly list",
+            "visualHint": "When child pointer exists, insert child list between curr and curr.next using stack or DFS."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'DFS traversal inserts child lists directly into parent next pointers while keeping prev pointers valid.',
       timeComplexity: 'O(N)',
@@ -445,6 +445,7 @@ public:
       { input: 'lists = [[1,4,5],[1,3,4],[2,6]]', output: '[1,1,2,3,4,4,5,6]' }
     ],
     constraints: ['k == lists.length', '0 <= k <= 10^4'],
+    functionName: 'mergeKLists',
     starterCode: {
       'Python': `def mergeKLists(lists):
     # Write your code here (Min-Heap or Divide & Conquer)
@@ -471,16 +472,15 @@ public:
     return null;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'lists = [[1,4,5],[1,3,4],[2,6]]',
-        expected: '[1,1,2,3,4,4,5,6]',
-        actual: hasValidCode ? '[1,1,2,3,4,4,5,6]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Min-Heap storing (node.val, node) extracts smallest head in O(log K) time.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "lists = [[1,4,5],[1,3,4],[2,6]]",
+            "expected": "[1,1,2,3,4,4,5,6]",
+            "visualHint": "Min-Heap storing (node.val, node) extracts smallest head in O(log K) time."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'A min-heap of size K keeps track of smallest unmerged node across all K lists.',
       timeComplexity: 'O(N log K)',

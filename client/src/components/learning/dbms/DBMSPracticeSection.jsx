@@ -27,6 +27,7 @@ import {
   getDBMSMcqQuestions
 } from '../../../data/dbms/dbmsPracticeData.js';
 import { assessmentService } from '../../../services/assessmentService.js';
+import { evaluateSQLQuery } from '../../../utils/codeEvaluator.js';
 import AddNoteButton from '../../notes/AddNoteButton.jsx';
 import DBMSSqlEditor from './DBMSSqlEditor.jsx';
 
@@ -73,7 +74,7 @@ export default function DBMSPracticeSection({
     }
   }, [activeChallenge]);
 
-  // Execute SQL Query via Backend Sandbox (assessmentService.runSql) with Client Fallback Evaluator
+  // Execute SQL Query via Sandbox Evaluator
   const handleRunQuery = async () => {
     if (!userQuery || !userQuery.trim()) return;
     setIsRunning(true);
@@ -82,79 +83,32 @@ export default function DBMSPracticeSection({
     const startTime = Date.now();
 
     try {
-      // 1. Send query to backend assessment service
-      let response = null;
+      // 1. Safe evaluation via client SQL sandbox with schema and challenge invariants
+      const evalResult = evaluateSQLQuery(
+        userQuery,
+        activeChallenge?.schema_context,
+        activeChallenge?.test_cases,
+        activeChallenge?.sample_data,
+        activeChallenge?.expected_result,
+        activeChallenge?.solution_query
+      );
+
+      // 2. Also notify backend sandbox if available for execution log persistence
       try {
-        response = await assessmentService.runSql(userQuery, activeChallenge?.schema_context);
+        await assessmentService.runSql(userQuery, activeChallenge?.schema_context);
       } catch (err) {
-        // Safe sandbox network fallback
-        response = null;
+        // Handled silently by client execution sandbox
       }
-
-      // Check if backend returned valid results
-      let returnedRows = null;
-      let backendPassed = false;
-      let errorMsg = null;
-
-      if (response?.success && response.result) {
-        returnedRows = response.result.result || [];
-        backendPassed = Boolean(response.result.passed);
-        errorMsg = response.result.error_message || null;
-      }
-
-      // 2. Client-side evaluation against challenge's expected result & test cases
-      const cleanedQuery = userQuery.trim().replace(/;+$/, '').toLowerCase();
-      const solutionKeywords = activeChallenge.solution_query
-        ? activeChallenge.solution_query.toLowerCase().replace(/;+$/, '')
-        : '';
-
-      // Check key SQL components
-      const hasBasicSelect = cleanedQuery.startsWith('select');
-      const containsExpectedColumns = activeChallenge.expected_result && activeChallenge.expected_result.length > 0
-        ? Object.keys(activeChallenge.expected_result[0]).some(k => cleanedQuery.includes(k.toLowerCase()))
-        : true;
-
-      const isMatch = (cleanedQuery === solutionKeywords) || 
-        (hasBasicSelect && containsExpectedColumns && backendPassed) ||
-        (cleanedQuery.includes('select') && cleanedQuery.includes('where'));
-
-      const evaluatedRows = returnedRows && returnedRows.length > 0
-        ? returnedRows
-        : (isMatch ? activeChallenge.expected_result : activeChallenge.sample_data || []);
-
-      // 3. Evaluate each test case
-      const evaluatedTests = (activeChallenge.test_cases || []).map((tc) => {
-        let pass = false;
-        try {
-          if (tc.passedCheck) {
-            pass = tc.passedCheck(isMatch ? activeChallenge.expected_result : evaluatedRows);
-          } else {
-            pass = isMatch;
-          }
-        } catch {
-          pass = false;
-        }
-        return {
-          id: tc.id,
-          title: tc.title,
-          description: tc.description,
-          passed: pass
-        };
-      });
-
-      const allPassed = evaluatedTests.length > 0 
-        ? evaluatedTests.every(t => t.passed) 
-        : isMatch;
 
       const executionMs = Date.now() - startTime;
 
-      setTestResults(evaluatedTests);
+      setTestResults(evalResult.cases || []);
       setExecutionOutput({
-        passed: allPassed,
-        status: allPassed ? 'Success' : 'Query Failed',
+        passed: evalResult.allPassed,
+        status: evalResult.status,
         execution_ms: executionMs > 0 ? executionMs : 14,
-        rows: isMatch ? activeChallenge.expected_result : evaluatedRows,
-        error_message: allPassed ? null : (errorMsg || 'Query output does not match expected result. Check filtering conditions and column aliases.')
+        rows: evalResult.rows || [],
+        error_message: evalResult.allPassed ? null : evalResult.output
       });
     } catch (err) {
       setExecutionOutput({

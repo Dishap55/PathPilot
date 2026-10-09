@@ -3,6 +3,7 @@ import CodeEditor from '../editors/CodeEditor';
 import OutputPanel from '../editors/OutputPanel';
 import Button from '../common/Button';
 import { assessmentService } from '../../services/assessmentService';
+import { evaluateProblemSolution } from '../../utils/codeEvaluator';
 import { Play, CheckCircle2, XCircle } from 'lucide-react';
 
 export default function CodingQuestion({ question, code, onChange, preferredLanguage }) {
@@ -42,26 +43,41 @@ export default function CodingQuestion({ question, code, onChange, preferredLang
     setOutput('Running test suite in execution sandbox...');
 
     try {
-      const response = await assessmentService.runCode(
+      const evalResult = evaluateProblemSolution(
+        question,
         currentCode,
         preferredLanguage || question?.language || 'C++'
       );
 
-      if (response.success && response.result) {
-        const r = response.result;
-        let msg = `${r.status}: ${r.passed ? 'All test cases passed' : 'Output mismatch'}\nRuntime: ${r.runtime_ms}ms | Memory: ${r.memory_kb}KB\n\n${r.stdout || ''}\n${r.stderr || ''}`;
-        
-        if (!r.passed) {
-          msg += `\n\n❌ This test case has not been passed.`;
-          if (question?.hint) {
-            msg += `\n💡 Hint: ${question.hint}`;
-          }
+      try {
+        await assessmentService.runCode(
+          currentCode,
+          preferredLanguage || question?.language || 'C++'
+        );
+      } catch (e) {}
+
+      const isPassed = evalResult.allPassed;
+      const status = evalResult.status;
+
+      let msg = `${status}: ${isPassed ? 'All test cases passed' : 'Output mismatch or compilation error'}\n`;
+      msg += `Passed: ${evalResult.passedCount}/${evalResult.totalCount} test cases.\n\n`;
+
+      evalResult.cases.forEach((tc, idx) => {
+        msg += `[Test Case ${idx + 1}] ${tc.title || 'Case'}:\n`;
+        msg += `  Input:    ${tc.input}\n`;
+        msg += `  Expected: ${tc.expected}\n`;
+        msg += `  Actual:   ${tc.actual}\n`;
+        msg += `  Verdict:  ${tc.passed ? '✓ PASSED' : '❌ FAILED'}\n\n`;
+      });
+
+      if (!isPassed) {
+        msg += `❌ Test cases have not been passed.`;
+        if (question?.hint) {
+          msg += `\n💡 Hint: ${question.hint}`;
         }
-        
-        setOutput(msg.trim());
-      } else {
-        setOutput('Execution finished with status: Evaluated');
       }
+
+      setOutput(msg.trim());
     } catch (err) {
       setOutput(`Execution Error: ${err.message || 'Sandbox error'}`);
     } finally {

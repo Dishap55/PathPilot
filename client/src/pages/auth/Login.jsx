@@ -114,7 +114,7 @@ export default function Login() {
         setSuccessMessage('Welcome back! Signed in successfully.');
         setTimeout(() => {
           navigate('/dashboard');
-        }, 600);
+        }, 150);
       } else {
         setIsSubmitting(false);
       }

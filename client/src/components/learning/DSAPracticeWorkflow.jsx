@@ -38,7 +38,7 @@ import { TWO_POINTERS_QUESTION_BANK } from '../../data/twoPointersQuestionBank';
 import { useBestu } from '../../contexts/BestuContext';
 import { useProfile } from '../../hooks/useProfile';
 import AddNoteButton from '../notes/AddNoteButton';
-import MyNotesList from '../notes/MyNotesList';
+import { evaluateProblemSolution, resolveFunctionName } from '../../utils/codeEvaluator';
 
 const PRACTICE_PROBLEMS = TWO_POINTERS_QUESTION_BANK;
 
@@ -241,15 +241,22 @@ export default function DSAPracticeWorkflow({ className = '', questionBank = TWO
     loadHistoryAndStats();
   }, [selectedProblemId, user?.id]);
 
+  // Dynamic Test Case Evaluation State
+  const [evaluationResult, setEvaluationResult] = useState(() =>
+    evaluateProblemSolution(activeProblem, code, selectedLang)
+  );
+
   // Sync selected problem when topic or question bank changes
   useEffect(() => {
     if (PRACTICE_PROBLEMS && PRACTICE_PROBLEMS.length > 0) {
       const defaultId = PRACTICE_PROBLEMS[0].id;
       setSelectedProblemId(defaultId);
-      setCode(PRACTICE_PROBLEMS[0].starterCode[selectedLang] || PRACTICE_PROBLEMS[0].starterCode['C++']);
+      const initialCode = PRACTICE_PROBLEMS[0].starterCode[selectedLang] || PRACTICE_PROBLEMS[0].starterCode['C++'];
+      setCode(initialCode);
       setWorkflowState('initial');
       setSelectedMcqOpt(null);
       setMcqSubmitted(false);
+      setEvaluationResult(evaluateProblemSolution(PRACTICE_PROBLEMS[0], initialCode, selectedLang));
     }
   }, [topicId, questionBank]);
 
@@ -257,11 +264,13 @@ export default function DSAPracticeWorkflow({ className = '', questionBank = TWO
   const handleProblemChange = (problemId) => {
     setSelectedProblemId(problemId);
     const newProblem = PRACTICE_PROBLEMS.find((p) => p.id === problemId) || PRACTICE_PROBLEMS[0];
-    setCode(newProblem.starterCode[selectedLang] || newProblem.starterCode['C++']);
+    const initialCode = newProblem.starterCode[selectedLang] || newProblem.starterCode['C++'];
+    setCode(initialCode);
     setWorkflowState('initial');
     setSelectedMcqOpt(null);
     setMcqSubmitted(false);
     setSelectedAttemptIdx(0);
+    setEvaluationResult(evaluateProblemSolution(newProblem, initialCode, selectedLang));
   };
 
   // Sync code when language changes
@@ -272,42 +281,15 @@ export default function DSAPracticeWorkflow({ className = '', questionBank = TWO
     } catch (e) {
       console.warn('[DSAPracticeWorkflow] Storage write failed:', e);
     }
-    setCode(activeProblem.starterCode[newLang] || activeProblem.starterCode['C++']);
+    const initialCode = activeProblem.starterCode[newLang] || activeProblem.starterCode['C++'];
+    setCode(initialCode);
     setWorkflowState('initial');
     setSelectedMcqOpt(null);
     setMcqSubmitted(false);
+    setEvaluationResult(evaluateProblemSolution(activeProblem, initialCode, newLang));
   };
 
-  // Evaluate if student code has user implementation beyond default stub
-  const isCodeMeaningful = () => {
-    const starter = activeProblem.starterCode[selectedLang] || '';
-    const normalize = (str) =>
-      (str || '')
-        .replace(/\/\/.*$/gm, '')
-        .replace(/\/\*[\s\S]*?\*\//g, '')
-        .replace(/\s+/g, '');
-
-    const normalizedCode = normalize(code);
-    const normalizedStarter = normalize(starter);
-
-    if (!code.trim() || normalizedCode === normalizedStarter) {
-      return false;
-    }
-
-    const stripped = code
-      .replace(/\/\/.*$/gm, '')
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/#include.*$/gm, '')
-      .replace(/using namespace.*$/gm, '')
-      .replace(/class Solution.*$/gm, '')
-      .replace(/public:.*$/gm, '')
-      .replace(/vector|int|numbers|target|height|string|String|bool|boolean|self|list|str|return|false|true|new|0|pass/g, '')
-      .replace(/[{};():,\s]/g, '');
-
-    return stripped.length > 2;
-  };
-
-  const hasValidCode = isCodeMeaningful();
+  const hasValidCode = Boolean(code && code.trim().length > 0);
 
   // Code Editing Handler
   const handleCodeChange = (e) => {
@@ -319,13 +301,15 @@ export default function DSAPracticeWorkflow({ className = '', questionBank = TWO
   };
 
   // Dynamic Test Case Evaluation Logic for active problem
-  const testCases = activeProblem.testCases ? activeProblem.testCases(code, hasValidCode) : [];
-  const allPassed = testCases.length > 0 && testCases.every((tc) => tc.passed);
+  const testCases = evaluationResult?.cases || [];
+  const allPassed = Boolean(evaluationResult?.allPassed);
   const failedCases = testCases.filter((tc) => !tc.passed);
 
   // STATE 3: Click RUN Handler
   const handleRunCode = () => {
     if (!hasValidCode) return;
+    const evaluated = evaluateProblemSolution(activeProblem, code, selectedLang);
+    setEvaluationResult(evaluated);
     setWorkflowState('results');
   };
 
@@ -849,17 +833,24 @@ export default function DSAPracticeWorkflow({ className = '', questionBank = TWO
             <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  Test Cases Execution Results ({activeProblem.functionName})
+                  Test Cases Execution Results ({activeProblem.functionName || resolveFunctionName(activeProblem, code)})
                 </span>
                 <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                   allPassed
                     ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300'
                     : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300'
                 }`}>
-                  {allPassed ? '✓ All Test Cases Passed!' : `✗ ${failedCases.length} Test Case Failed`}
+                  {allPassed ? '✓ All Test Cases Passed!' : `✗ ${failedCases.length} Test Case${failedCases.length === 1 ? '' : 's'} Failed`}
                 </span>
               </div>
             </div>
+
+            {/* Execution / Compilation Output Feedback */}
+            {evaluationResult?.output && !allPassed && (
+              <div className="p-3.5 bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-xl text-xs font-mono text-rose-700 dark:text-rose-300 whitespace-pre-wrap leading-relaxed">
+                {evaluationResult.output}
+              </div>
+            )}
 
             {/* Test Cases Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">

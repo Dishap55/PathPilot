@@ -357,7 +357,7 @@ export default function ProfileSetup({ isEmbedded = false }) {
         setIsLoading(false);
         setTimeout(() => {
           navigate('/dashboard');
-        }, 800);
+        }, 150);
         return;
       }
 
@@ -392,12 +392,12 @@ export default function ProfileSetup({ isEmbedded = false }) {
         setSuccessMessage('Profile saved successfully! Proceeding to your initial skill assessment...');
         setTimeout(() => {
           navigate('/assessment/initial');
-        }, 800);
+        }, 150);
       } else {
         setSuccessMessage('Profile setup completed successfully! Redirecting to your dashboard...');
         setTimeout(() => {
           navigate('/dashboard');
-        }, 800);
+        }, 150);
       }
 
     } catch (err) {

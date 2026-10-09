@@ -28,6 +28,7 @@ import AddNoteButton from '../../notes/AddNoteButton.jsx';
 import MyNotesList from '../../notes/MyNotesList.jsx';
 import { useNotes } from '../../../hooks/useNotes.js';
 import { useBestu } from '../../../contexts/BestuContext.jsx';
+import { evaluateOOPSSolution } from '../../../utils/codeEvaluator.js';
 
 /**
  * OOPSPracticeSection Component
@@ -190,33 +191,23 @@ export default function OOPSPracticeSection({
   const handleRunCode = () => {
     setCodeRunStatus('running');
 
-    // Deterministic client validation based on requirements
     setTimeout(() => {
-      const codeTrimmed = userCode.trim();
-      const hasImplementation =
-        codeTrimmed.length > 50 &&
-        !codeTrimmed.includes('// Your code here') &&
-        !codeTrimmed.includes('pass') &&
-        !codeTrimmed.includes('TODO');
+      const evalResult = evaluateOOPSSolution(activeChallenge, userCode, selectedLanguage);
 
-      if (hasImplementation) {
+      if (evalResult.allPassed) {
         setCodeRunStatus('success');
-        setExecutionResults({
-          allPassed: true,
-          output: 'All test cases executed and passed successfully! Class invariant verified.',
-          casesPassed: activeChallenge.testCases.length,
-          totalCases: activeChallenge.testCases.length
-        });
       } else {
         setCodeRunStatus('failed');
-        setExecutionResults({
-          allPassed: false,
-          output: 'Verification notice: Implement the required methods or remove TODO placeholders before test validation.',
-          casesPassed: 0,
-          totalCases: activeChallenge.testCases.length
-        });
       }
-    }, 400);
+
+      setExecutionResults({
+        allPassed: evalResult.allPassed,
+        output: evalResult.output,
+        casesPassed: evalResult.casesPassed,
+        totalCases: evalResult.totalCases,
+        cases: evalResult.cases
+      });
+    }, 250);
   };
 
   // =========================================================================
@@ -982,6 +973,41 @@ export default function OOPSPracticeSection({
                   <p className="font-mono text-[11px] leading-relaxed">
                     {executionResults.output}
                   </p>
+
+                  {executionResults.cases && executionResults.cases.length > 0 && (
+                    <div className="space-y-1.5 mt-2.5 pt-2.5 border-t border-slate-300/60">
+                      {executionResults.cases.map((tc) => (
+                        <div
+                          key={tc.id}
+                          className={`flex flex-col sm:flex-row sm:items-center justify-between text-[11px] font-mono p-2 rounded-xl border gap-1 ${
+                            tc.passed
+                              ? 'bg-white/80 border-emerald-300 text-emerald-950'
+                              : 'bg-white/80 border-red-300 text-red-950'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5">
+                            {tc.passed ? (
+                              <CheckCircle2 size={13} className="text-emerald-600 shrink-0" />
+                            ) : (
+                              <XCircle size={13} className="text-red-500 shrink-0" />
+                            )}
+                            <span className="font-bold">Case {tc.id}:</span>
+                            <span className="truncate max-w-[200px] sm:max-w-none text-slate-700">{tc.input}</span>
+                          </div>
+                          <div className="flex items-center gap-2 self-end sm:self-auto">
+                            <span className="text-[10px] text-slate-500">Exp: {tc.expected}</span>
+                            <span
+                              className={`font-black uppercase text-[10px] px-1.5 py-0.5 rounded-md ${
+                                tc.passed ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {tc.passed ? 'PASS' : 'FAIL'}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

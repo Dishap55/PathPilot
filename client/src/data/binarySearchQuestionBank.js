@@ -33,6 +33,7 @@ export const BINARY_SEARCH_QUESTION_BANK = [
       { input: 'nums = [-1,0,3,5,9,12], target = 2', output: '-1' }
     ],
     constraints: ['1 <= nums.length <= 10^4', 'nums is sorted in ascending order.'],
+    functionName: 'search',
     starterCode: {
       'Python': `def search(nums, target):
     # Write your code here
@@ -58,16 +59,15 @@ public:
     return -1;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [-1,0,3,5,9,12], target = 9',
-        expected: '4',
-        actual: hasValidCode ? '4' : '-1',
-        passed: hasValidCode,
-        visualHint: 'mid = low + (high - low) / 2. Adjust low = mid + 1 or high = mid - 1.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [-1,0,3,5,9,12], target = 9",
+            "expected": "4",
+            "visualHint": "mid = low + (high - low) / 2. Adjust low = mid + 1 or high = mid - 1."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Halve the search space at each step by comparing target with mid element.',
       timeComplexity: 'O(log N)',
@@ -96,6 +96,7 @@ public:
       { input: 'nums = [5,7,7,8,8,10], target = 8', output: '[3, 4]' }
     ],
     constraints: ['0 <= nums.length <= 10^5', 'nums is sorted.'],
+    functionName: 'searchRange',
     starterCode: {
       'Python': `def searchRange(nums, target):
     # Write your code here
@@ -121,16 +122,15 @@ public:
     return [-1, -1];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [5,7,7,8,8,10], target = 8',
-        expected: '[3, 4]',
-        actual: hasValidCode ? '[3, 4]' : '[-1, -1]',
-        passed: hasValidCode,
-        visualHint: 'Run binary search twice: once shrinking right boundary for first pos, once shrinking left boundary for last pos.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [5,7,7,8,8,10], target = 8",
+            "expected": "[3, 4]",
+            "visualHint": "Run binary search twice: once shrinking right boundary for first pos, once shrinking left boundary for last pos."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Modify standard binary search to keep searching leftward for first occurrence and rightward for last occurrence.',
       timeComplexity: 'O(log N)',
@@ -155,6 +155,7 @@ public:
       { input: 'nums = [4,5,6,7,0,1,2], target = 0', output: '4' }
     ],
     constraints: ['1 <= nums.length <= 5000', 'All values are distinct.'],
+    functionName: 'search',
     starterCode: {
       'Python': `def search(nums, target):
     # Write your code here
@@ -180,16 +181,15 @@ public:
     return -1;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [4,5,6,7,0,1,2], target = 0',
-        expected: '4',
-        actual: hasValidCode ? '4' : '-1',
-        passed: hasValidCode,
-        visualHint: 'At least one half [low, mid] or [mid, high] is guaranteed to be sorted.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [4,5,6,7,0,1,2], target = 0",
+            "expected": "4",
+            "visualHint": "At least one half [low, mid] or [mid, high] is guaranteed to be sorted."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Identify which half is sorted. Check if target lies within the sorted half boundary.',
       timeComplexity: 'O(log N)',
@@ -219,6 +219,7 @@ public:
       { input: 'nums = [1,3,5,6], target = 2', output: '1' }
     ],
     constraints: ['1 <= nums.length <= 10^4'],
+    functionName: 'searchInsert',
     starterCode: {
       'Python': `def searchInsert(nums, target):
     # Write your code here
@@ -244,16 +245,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1,3,5,6], target = 2',
-        expected: '1',
-        actual: hasValidCode ? '1' : '0',
-        passed: hasValidCode,
-        visualHint: 'Lower bound binary search: return low index after loop exits.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1,3,5,6], target = 2",
+            "expected": "1",
+            "visualHint": "Lower bound binary search: return low index after loop exits."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'When low > high, low points to the smallest index where nums[index] >= target.',
       timeComplexity: 'O(log N)',
@@ -282,6 +282,7 @@ public:
       { input: 'piles = [3,6,7,11], h = 8', output: '4' }
     ],
     constraints: ['1 <= piles.length <= 10^4', 'piles.length <= h <= 10^9'],
+    functionName: 'minEatingSpeed',
     starterCode: {
       'Python': `def minEatingSpeed(piles, h):
     # Write your code here
@@ -309,16 +310,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'piles = [3,6,7,11], h = 8',
-        expected: '4',
-        actual: hasValidCode ? '4' : '0',
-        passed: hasValidCode,
-        visualHint: 'Binary search speed k in range [1, max(piles)]. Calculate total hours sum(ceil(pile / k)).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "piles = [3,6,7,11], h = 8",
+            "expected": "4",
+            "visualHint": "Binary search speed k in range [1, max(piles)]. Calculate total hours sum(ceil(pile / k))."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Eating speed k is monotonic: if speed k works, any speed > k also works. Binary search search space [1, maxPile].',
       timeComplexity: 'O(N log(maxPile))',
@@ -347,6 +347,7 @@ public:
       { input: 'nums = [1,2,3,1]', output: '2' }
     ],
     constraints: ['1 <= nums.length <= 1000'],
+    functionName: 'findPeakElement',
     starterCode: {
       'Python': `def findPeakElement(nums):
     # Write your code here
@@ -372,16 +373,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'nums = [1,2,3,1]',
-        expected: '2',
-        actual: hasValidCode ? '2' : '0',
-        passed: hasValidCode,
-        visualHint: 'If nums[mid] < nums[mid+1], a peak MUST exist in the right half.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "nums = [1,2,3,1]",
+            "expected": "2",
+            "visualHint": "If nums[mid] < nums[mid+1], a peak MUST exist in the right half."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Follow the increasing slope. A peak is guaranteed on the side of the larger neighbor.',
       timeComplexity: 'O(log N)',
@@ -409,6 +409,7 @@ public:
       { input: 'matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3', output: 'true' }
     ],
     constraints: ['m == matrix.length', 'n == matrix[i].length'],
+    functionName: 'searchMatrix',
     starterCode: {
       'Python': `def searchMatrix(matrix, target):
     # Write your code here
@@ -434,16 +435,15 @@ public:
     return false;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'matrix = 3x4 grid, target = 3',
-        expected: 'true',
-        actual: hasValidCode ? 'true' : 'false',
-        passed: hasValidCode,
-        visualHint: 'Treat 2D grid as 1D virtual array of length M*N: row = mid / N, col = mid % N.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "matrix = 3x4 grid, target = 3",
+            "expected": "true",
+            "visualHint": "Treat 2D grid as 1D virtual array of length M*N: row = mid / N, col = mid % N."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'A row-wise sorted 2D matrix maps directly to a 1D sorted array of size M*N.',
       timeComplexity: 'O(log(M * N))',
@@ -473,6 +473,7 @@ public:
       { input: 'weights = [1,2,3,4,5,6,7,8,9,10], days = 5', output: '15' }
     ],
     constraints: ['1 <= days <= weights.length <= 5 * 10^4'],
+    functionName: 'shipWithinDays',
     starterCode: {
       'Python': `def shipWithinDays(weights, days):
     # Write your code here
@@ -500,16 +501,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'weights = [1..10], days = 5',
-        expected: '15',
-        actual: hasValidCode ? '15' : '0',
-        passed: hasValidCode,
-        visualHint: 'Binary search capacity between max(weights) and sum(weights).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "weights = [1..10], days = 5",
+            "expected": "15",
+            "visualHint": "Binary search capacity between max(weights) and sum(weights)."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Capacity is monotonic. Range is [max(weights), sum(weights)].',
       timeComplexity: 'O(N log(sum - max))',

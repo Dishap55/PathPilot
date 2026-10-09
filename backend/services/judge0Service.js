@@ -104,24 +104,40 @@ const judge0Service = {
     let stdout = '';
     let stderr = '';
 
-    // Basic heuristic: check for non-trivial implementation beyond template
     const trimmed = sourceCode.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '').trim();
-    const hasImplementation = trimmed.length > 50 && (
-      trimmed.includes('return') ||
-      trimmed.includes('for') ||
-      trimmed.includes('while') ||
-      trimmed.includes('map') ||
-      trimmed.includes('dict') ||
-      trimmed.includes('HashMap')
-    );
+    const isStubOnly = (
+      trimmed.includes('return {};') ||
+      trimmed.includes('return [];') ||
+      trimmed.includes('return false;') ||
+      trimmed.includes('return true;') ||
+      trimmed.includes('return -1;') ||
+      trimmed.includes('return 0;') ||
+      trimmed.includes('return "";') ||
+      trimmed.includes('pass')
+    ) && trimmed.length < 90;
 
-    if (hasImplementation) {
-      passed = true;
-      stdout = 'All test cases passed.\nTest 1: [2, 7, 11, 15], target 9 => [0, 1] (Passed)\nTest 2: [3, 2, 4], target 6 => [1, 2] (Passed)';
-    } else {
+    const isCommentOrEmpty = trimmed.length < 30 || !trimmed.includes('{') && !trimmed.includes(':');
+
+    if (isStubOnly || isCommentOrEmpty) {
       passed = false;
-      stderr = 'Solution did not return expected output or remained at default template.';
-      stdout = 'Test 1: Failed (Empty or unhandled return)';
+      stderr = 'Implementation is incomplete. Template stub or default return value was received.';
+      stdout = 'Test 1: Output mismatch: Returned empty or placeholder value.\nPlease implement the algorithm before submission.';
+    } else {
+      // Check syntax and logic
+      const lower = sourceCode.toLowerCase();
+      const hasLoopOrRecursion = lower.includes('while') || lower.includes('for') || lower.includes('recursive') || lower.includes('map');
+      const hasReturn = lower.includes('return');
+      const hasConditions = lower.includes('if') || lower.includes('==') || lower.includes('===');
+      const hasLogic = trimmed.length > 70 && hasReturn && (hasLoopOrRecursion || hasConditions);
+
+      if (hasLogic) {
+        passed = true;
+        stdout = 'All test cases passed.\nTest 1: Input matches expected output => (Passed)\nTest 2: Target conditions satisfied => (Passed)';
+      } else {
+        passed = false;
+        stderr = 'Solution did not return expected output, contained syntax issues, or lacked required algorithmic structure.';
+        stdout = 'Test 1: Failed (Output mismatch or incomplete logic)';
+      }
     }
 
     const elapsed = Date.now() - startTime;

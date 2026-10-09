@@ -58,6 +58,29 @@ function extractJsonFromText(rawText) {
  * @param {string} [context.preferredQuestionType='mcq'] - 'mcq' or 'coding'
  * @returns {Promise<Object>} - Validated question object
  */
+// Fast in-memory adaptive question pool: stores pre-validated generated questions
+const questionCache = new Map();
+
+function getCacheKey(subject, topicId, difficulty, questionType) {
+  return `${subject}:${topicId}:${difficulty}:${questionType}`;
+}
+
+/**
+ * Generates an adaptive question using Gemini AI or returns a validated fallback question.
+ * 
+ * @param {Object} context
+ * @param {string} context.subject - Canonical subject
+ * @param {string} context.studentLevel - Beginner | Intermediate | Advanced
+ * @param {Array<{id: string, name: string}>} context.canonicalTopics - Topics in this subject
+ * @param {{ id: string, name: string }} context.currentTopic - Current topic to ask
+ * @param {string} context.currentDifficulty - Easy | Medium | Hard
+ * @param {Object} [context.previousResult] - { correct, skipped, confidence, timeTaken }
+ * @param {Array} [context.recentPerformance] - History of recent question outcomes
+ * @param {Array<string>} [context.askedQuestionIds] - Previously asked question IDs
+ * @param {Array<string>} [context.askedQuestionContents] - Previously asked question texts
+ * @param {string} [context.preferredQuestionType='mcq'] - 'mcq' or 'coding'
+ * @returns {Promise<Object>} - Validated question object
+ */
 async function generateAdaptiveQuestion(context) {
   const {
     subject,
@@ -75,7 +98,19 @@ async function generateAdaptiveQuestion(context) {
   const isCodingEligible = ['DSA', 'DBMS'].includes(subject) && preferredQuestionType === 'coding';
   const targetType = isCodingEligible ? 'coding' : 'mcq';
 
-  // Check if Gemini API is available and not in fast unit test mode
+  // 1. Check in-memory pool for pre-generated question (0ms latency)
+  const poolKey = getCacheKey(subject, currentTopic.id, currentDifficulty, targetType);
+  const cachedPool = questionCache.get(poolKey) || [];
+  const candidateFromCache = cachedPool.find(q =>
+    !askedQuestionIds.includes(q.questionId) &&
+    !askedQuestionContents.includes(q.question)
+  );
+
+  if (candidateFromCache) {
+    return shuffleQuestion({ ...candidateFromCache, questionId: `gemini_${Date.now()}_${Math.random().toString(36).slice(2, 6)}` });
+  }
+
+  // 2. Check if Gemini API is available and not in fast unit test mode
   if (geminiConfig.apiKey && process.env.SKIP_GEMINI_AI !== 'true') {
     try {
       const prompt = `You are the PathPilot Assessment Engine. Generate a college placement diagnostic question with STRICT adherence to the following criteria:
@@ -116,9 +151,9 @@ JSON SCHEMA for MCQ:
 
 Return RAW JSON only.`;
 
-      // Fast timeout promise
+      // Fast 1200ms timeout promise: if Gemini is slow, instantly fall back to canonical bank
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Gemini API timeout')), 3000)
+        setTimeout(() => reject(new Error('Gemini API fast-timeout')), 1200)
       );
 
       const responsePromise = geminiClient.generateGuidance(prompt, {
@@ -157,6 +192,11 @@ Return RAW JSON only.`;
               isAiGenerated: true,
               isFallback: false
             };
+            const currentPool = questionCache.get(poolKey) || [];
+            if (currentPool.length < 10) {
+              currentPool.push(finalQ);
+              questionCache.set(poolKey, currentPool);
+            }
             return shuffleQuestion(finalQ);
           }
         }

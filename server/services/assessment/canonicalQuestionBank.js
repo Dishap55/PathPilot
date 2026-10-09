@@ -134,7 +134,9 @@ const CANONICAL_QUESTION_BANK = [
     problemStatement: 'Write an ANSI SQL query to select `employee_id`, `name`, `department`, and `salary` from table `employees` where `salary > 50000` ordered by `department` ascending.',
     constraints: ['Standard ANSI SQL', 'Salary > 50000'],
     supportedLanguages: ['sql'],
-    starterCode: 'SELECT employee_id, name, department, salary\nFROM employees\nWHERE salary > 50000\nORDER BY department ASC;',
+    starterCode: {
+      sql: '-- Write your SQL query here\n-- Retrieve employee_id, name, department, salary where salary > 50000\n\nSELECT \n  \nFROM employees\nWHERE \nORDER BY ;'
+    },
     testCases: [
       { id: 1, title: 'Salary filter test', expected: 'Rows where salary > 50000' }
     ],
@@ -267,10 +269,10 @@ const CANONICAL_QUESTION_BANK = [
     constraints: ['1 <= s.length <= 2 * 10^5', 's consists only of printable ASCII characters.'],
     supportedLanguages: ['cpp', 'java', 'python', 'javascript'],
     starterCode: {
-      cpp: '#include <string>\n#include <cctype>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isPalindrome(string s) {\n        // Write your solution here\n        // Hint: filter alphanumeric characters and check with two pointers\n        \n        return true;\n    }\n};',
-      java: 'class Solution {\n    public boolean isPalindrome(String s) {\n        // Write your solution here\n        // Hint: filter alphanumeric characters and check with two pointers\n        \n        return true;\n    }\n}',
+      cpp: '#include <string>\n#include <cctype>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isPalindrome(string s) {\n        // Write your solution here\n        // Hint: filter alphanumeric characters and check with two pointers\n        \n    }\n};',
+      java: 'class Solution {\n    public boolean isPalindrome(String s) {\n        // Write your solution here\n        // Hint: filter alphanumeric characters and check with two pointers\n        \n    }\n}',
       python: 'class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        # Write your solution here\n        # Hint: filter alphanumeric characters and check with two pointers\n        pass',
-      javascript: '/**\n * @param {string} s\n * @return {boolean}\n */\nfunction isPalindrome(s) {\n    // Write your solution here\n    // Hint: filter alphanumeric characters and check with two pointers\n    \n    return true;\n}'
+      javascript: '/**\n * @param {string} s\n * @return {boolean}\n */\nfunction isPalindrome(s) {\n    // Write your solution here\n    // Hint: filter alphanumeric characters and check with two pointers\n    \n}'
     },
     hint: 'Move left and right pointers towards each other, skipping non-alphanumeric characters and comparing lowercase values.',
     testCases: [
@@ -381,10 +383,10 @@ const CANONICAL_QUESTION_BANK = [
     constraints: ['1 <= nums.length <= 10^5', '-10^9 <= nums[i] <= 10^9'],
     supportedLanguages: ['cpp', 'java', 'python', 'javascript'],
     starterCode: {
-      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isSorted(vector<int>& nums) {\n        // Write your solution here\n        // Hint: iterate through array and check if nums[i] > nums[i+1]\n        \n        return true;\n    }\n};',
-      java: 'class Solution {\n    public boolean isSorted(int[] nums) {\n        // Write your solution here\n        // Hint: iterate through array and check if nums[i] > nums[i+1]\n        \n        return true;\n    }\n}',
-      python: 'class Solution:\n    def isSorted(self, nums: list[int]) -> bool:\n        # Write your solution here\n        # Hint: iterate through array and check if nums[i] > nums[i+1]\n        return True',
-      javascript: '/**\n * @param {number[]} nums\n * @return {boolean}\n */\nfunction isSorted(nums) {\n    // Write your solution here\n    // Hint: iterate through array and check if nums[i] > nums[i+1]\n    \n    return true;\n}'
+      cpp: '#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isSorted(vector<int>& nums) {\n        // Write your solution here\n        // Hint: iterate through array and check if nums[i] > nums[i+1]\n        \n    }\n};',
+      java: 'class Solution {\n    public boolean isSorted(int[] nums) {\n        // Write your solution here\n        // Hint: iterate through array and check if nums[i] > nums[i+1]\n        \n    }\n}',
+      python: 'class Solution:\n    def isSorted(self, nums: list[int]) -> bool:\n        # Write your solution here\n        # Hint: iterate through array and check if nums[i] > nums[i+1]\n        pass',
+      javascript: '/**\n * @param {number[]} nums\n * @return {boolean}\n */\nfunction isSorted(nums) {\n    // Write your solution here\n    // Hint: iterate through array and check if nums[i] > nums[i+1]\n    \n}'
     },
     hint: 'Iterate from i = 0 to nums.length - 2. If nums[i] > nums[i+1], return false. If loop finishes, return true.',
     testCases: [

@@ -32,6 +32,7 @@ export const TREES_QUESTION_BANK = [
       { input: 'root = [3, 9, 20, null, null, 15, 7]', output: '3' }
     ],
     constraints: ['Number of nodes in tree is in range [0, 10^4]', '-100 <= Node.val <= 100'],
+    functionName: 'maxDepth',
     starterCode: {
       'Python': `def maxDepth(root):
     # Write your code here
@@ -54,16 +55,15 @@ public:
     return 0;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'root = [3, 9, 20, null, null, 15, 7]',
-        expected: '3',
-        actual: hasValidCode ? '3' : '0',
-        passed: hasValidCode,
-        visualHint: 'Recursive DFS: maxDepth(root) = 1 + max(maxDepth(root.left), maxDepth(root.right)).'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "root = [3, 9, 20, null, null, 15, 7]",
+            "expected": "3",
+            "visualHint": "Recursive DFS: maxDepth(root) = 1 + max(maxDepth(root.left), maxDepth(root.right))."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Compute height recursively: base case root==null returns 0.',
       timeComplexity: 'O(N)',
@@ -90,6 +90,7 @@ public:
       { input: 'root = [1, null, 2, 3]', output: '[1, 3, 2]' }
     ],
     constraints: ['Number of nodes in tree is in range [0, 100]'],
+    functionName: 'inorderTraversal',
     starterCode: {
       'Python': `def inorderTraversal(root):
     # Write your code here
@@ -112,16 +113,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'root = [1, null, 2, 3]',
-        expected: '[1, 3, 2]',
-        actual: hasValidCode ? '[1, 3, 2]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Inorder: visit left subtree, process root, visit right subtree.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "root = [1, null, 2, 3]",
+            "expected": "[1, 3, 2]",
+            "visualHint": "Inorder: visit left subtree, process root, visit right subtree."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Inorder traversal visits nodes in ascending key order for a BST.',
       timeComplexity: 'O(N)',
@@ -149,6 +149,7 @@ public:
       { input: 'root = [4, 2, 7, 1, 3, 6, 9]', output: '[4, 7, 2, 9, 6, 3, 1]' }
     ],
     constraints: ['Number of nodes in tree is in range [0, 100]'],
+    functionName: 'invertTree',
     starterCode: {
       'Python': `def invertTree(root):
     # Write your code here
@@ -171,16 +172,15 @@ public:
     return null;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'root = [4, 2, 7, 1, 3, 6, 9]',
-        expected: '[4, 7, 2, 9, 6, 3, 1]',
-        actual: hasValidCode ? '[4, 7, 2, 9, 6, 3, 1]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'Recursively swap root.left and root.right pointers.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "root = [4, 2, 7, 1, 3, 6, 9]",
+            "expected": "[4, 7, 2, 9, 6, 3, 1]",
+            "visualHint": "Recursively swap root.left and root.right pointers."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Bottom-up or top-down recursive subtree swapping creates mirror reflection of tree.',
       timeComplexity: 'O(N)',
@@ -208,6 +208,7 @@ public:
       { input: 'p = [1,2,3], q = [1,2,3]', output: 'true' }
     ],
     constraints: ['Number of nodes in both trees is in range [0, 100]'],
+    functionName: 'isSameTree',
     starterCode: {
       'Python': `def isSameTree(p, q):
     # Write your code here
@@ -230,16 +231,15 @@ public:
     return false;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'p = [1,2,3], q = [1,2,3]',
-        expected: 'true',
-        actual: hasValidCode ? 'true' : 'false',
-        passed: hasValidCode,
-        visualHint: 'Compare p.val == q.val and recursively check left and right subtrees.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "p = [1,2,3], q = [1,2,3]",
+            "expected": "true",
+            "visualHint": "Compare p.val == q.val and recursively check left and right subtrees."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Simultaneous recursion checks node equality and structural identity.',
       timeComplexity: 'O(N)',
@@ -266,6 +266,7 @@ public:
       { input: 'root = [3, 9, 20, null, null, 15, 7]', output: '[[3], [9, 20], [15, 7]]' }
     ],
     constraints: ['Number of nodes in tree is in range [0, 2000]'],
+    functionName: 'levelOrder',
     starterCode: {
       'Python': `def levelOrder(root):
     # Write your code here
@@ -292,16 +293,15 @@ public:
     return [];
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'root = [3, 9, 20, null, null, 15, 7]',
-        expected: '[[3], [9, 20], [15, 7]]',
-        actual: hasValidCode ? '[[3], [9, 20], [15, 7]]' : '[]',
-        passed: hasValidCode,
-        visualHint: 'BFS queue: loop queueSize times per level to group level elements.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "root = [3, 9, 20, null, null, 15, 7]",
+            "expected": "[[3], [9, 20], [15, 7]]",
+            "visualHint": "BFS queue: loop queueSize times per level to group level elements."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Queue-based BFS captures nodes level-by-level.',
       timeComplexity: 'O(N)',
@@ -332,6 +332,7 @@ public:
       { input: 'root = [5, 1, 4, null, null, 3, 6]', output: 'false' }
     ],
     constraints: ['Number of nodes in tree is in range [1, 10^4]'],
+    functionName: 'isValidBST',
     starterCode: {
       'Python': `def isValidBST(root):
     # Write your code here
@@ -354,16 +355,15 @@ public:
     return false;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'root = [2, 1, 3]',
-        expected: 'true',
-        actual: hasValidCode ? 'true' : 'false',
-        passed: hasValidCode,
-        visualHint: 'Pass valid range (minBound, maxBound) down recursion stack.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "root = [2, 1, 3]",
+            "expected": "true",
+            "visualHint": "Pass valid range (minBound, maxBound) down recursion stack."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Each node must satisfy minBound < node.val < maxBound across its entire subtree path.',
       timeComplexity: 'O(N)',
@@ -391,6 +391,7 @@ public:
       { input: 'root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1', output: '3' }
     ],
     constraints: ['Number of nodes in tree is in range [2, 10^5]'],
+    functionName: 'lowestCommonAncestor',
     starterCode: {
       'Python': `def lowestCommonAncestor(root, p, q):
     # Write your code here
@@ -413,16 +414,15 @@ public:
     return null;
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1',
-        expected: '3',
-        actual: hasValidCode ? '3' : 'null',
-        passed: hasValidCode,
-        visualHint: 'If root matches p or q, return root. If left and right child returns are both non-null, root is the LCA.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1",
+            "expected": "3",
+            "visualHint": "If root matches p or q, return root. If left and right child returns are both non-null, root is the LCA."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Bottom-up postorder recursion returns non-null when target nodes p or q are found.',
       timeComplexity: 'O(N)',
@@ -450,6 +450,7 @@ public:
       { input: 'root = [1, 2, 3, null, null, 4, 5]', output: '[1, 2, 3, null, null, 4, 5]' }
     ],
     constraints: ['Number of nodes in tree is in range [0, 10^4]'],
+    functionName: 'serialize',
     starterCode: {
       'Python': `class Codec:
     def serialize(self, root):
@@ -470,16 +471,15 @@ public:
     deserialize(data) { return null; }
 }`
     },
-    testCases: (code, hasValidCode) => [
+    testCases: [
       {
-        id: 1,
-        input: 'root = [1, 2, 3, null, null, 4, 5]',
-        expected: 'Same tree reconstructed',
-        actual: hasValidCode ? 'Same tree reconstructed' : 'Failed',
-        passed: hasValidCode,
-        visualHint: 'Preorder DFS with `#` for null nodes allows deterministic string serialization and reconstruction.'
+            "id": 1,
+            "title": "Test Case 1",
+            "input": "root = [1, 2, 3, null, null, 4, 5]",
+            "expected": "Same tree reconstructed",
+            "visualHint": "Preorder DFS with `#` for null nodes allows deterministic string serialization and reconstruction."
       }
-    ],
+],
     solutionAnalysis: {
       intuition: 'Preorder traversal string encoding null markers uniquely defines binary tree structure.',
       timeComplexity: 'O(N)',
