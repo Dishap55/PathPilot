@@ -603,9 +603,24 @@ export default function OOPSLearningPage() {
                 </button>
               </div>
 
-              <span className="text-[11px] font-bold text-[#6574C4]">
-                Section {OOPS_SECTIONS.findIndex((s) => s.id === activeSection) + 1} of 5 &bull; {SECTION_TITLE_MAP[activeSection]}
-              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[11px] font-bold text-[#6574C4]">
+                  Section {OOPS_SECTIONS.findIndex((s) => s.id === activeSection) + 1} of 5 &bull; {SECTION_TITLE_MAP[activeSection]}
+                </span>
+                <div className="flex items-center gap-1.5 bg-[#FFFDF9] border border-[#D9D1C7] rounded-xl px-2 py-0.5 shadow-2xs">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Lang:</span>
+                  <select
+                    id="oops-header-language-select"
+                    value={selectedLanguage}
+                    onChange={(e) => setSelectedLanguage(e.target.value)}
+                    className="bg-transparent text-xs font-mono font-bold text-[#6574C4] focus:outline-none cursor-pointer"
+                  >
+                    <option value="Java">Java</option>
+                    <option value="Python">Python</option>
+                    <option value="C++">C++</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             {/* 5-Section Buttons Tablist */}

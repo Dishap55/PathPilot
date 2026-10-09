@@ -36,6 +36,8 @@ import { evaluateOOPSSolution } from '../../../utils/codeEvaluator.js';
  * 1. 🧠 MCQ Practice (Progressive Hints, Retry, Step Solutions, Question Navigator)
  * 2. 💻 Code Practice (DSA-style coding workflow: Problem, Write Code, Run, Test Cases, Submit)
  */
+const OOPS_LANGUAGES = ['Java', 'Python', 'C++'];
+
 export default function OOPSPracticeSection({
   selectedLanguage = 'Java',
   onLanguageChange,
@@ -171,18 +173,38 @@ export default function OOPSPracticeSection({
   const [activeChallengeIndex, setActiveChallengeIndex] = useState(0);
   const activeChallenge = OOPS_CODE_CHALLENGES[activeChallengeIndex] || OOPS_CODE_CHALLENGES[0];
 
+  const [activeLang, setActiveLang] = useState(() => selectedLanguage || 'Java');
+
+  useEffect(() => {
+    if (selectedLanguage && selectedLanguage !== activeLang) {
+      setActiveLang(selectedLanguage);
+    }
+  }, [selectedLanguage]);
+
   const [userCode, setUserCode] = useState(() => {
-    return activeChallenge?.starterCode[selectedLanguage] || activeChallenge?.starterCode.Java;
+    return activeChallenge?.starterCode[activeLang] || activeChallenge?.starterCode.Java;
   });
+
+  const handleLanguageChange = (newLang) => {
+    setActiveLang(newLang);
+    if (onLanguageChange) {
+      onLanguageChange(newLang);
+    }
+    if (activeChallenge?.starterCode) {
+      setUserCode(activeChallenge.starterCode[newLang] || activeChallenge.starterCode.Java || '');
+    }
+    setCodeRunStatus(null);
+    setExecutionResults(null);
+  };
 
   // Update starter code when language or challenge switches
   useEffect(() => {
     if (activeChallenge) {
-      setUserCode(activeChallenge.starterCode[selectedLanguage] || activeChallenge.starterCode.Java);
+      setUserCode(activeChallenge.starterCode[activeLang] || activeChallenge.starterCode.Java || '');
     }
     setCodeRunStatus(null);
     setExecutionResults(null);
-  }, [activeChallengeIndex, selectedLanguage]);
+  }, [activeChallengeIndex, activeLang]);
 
   const [codeRunStatus, setCodeRunStatus] = useState(null); // 'running' | 'success' | 'failed'
   const [executionResults, setExecutionResults] = useState(null);
@@ -192,7 +214,7 @@ export default function OOPSPracticeSection({
     setCodeRunStatus('running');
 
     setTimeout(() => {
-      const evalResult = evaluateOOPSSolution(activeChallenge, userCode, selectedLanguage);
+      const evalResult = evaluateOOPSSolution(activeChallenge, userCode, activeLang);
 
       if (evalResult.allPassed) {
         setCodeRunStatus('success');
@@ -908,12 +930,24 @@ export default function OOPSPracticeSection({
                   <div className="flex items-center gap-2">
                     <Code2 size={16} className="text-[#6574C4]" />
                     <span className="text-xs font-bold text-slate-200">
-                      {selectedLanguage} Editor &bull; {activeChallenge.title.split('(')[0]}
+                      {activeLang} Editor &bull; {activeChallenge.title.split('(')[0]}
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-indigo-300 border border-slate-700">
-                    {selectedLanguage}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-semibold text-slate-400">Language:</span>
+                    <select
+                      id="oops-language-dropdown"
+                      value={activeLang}
+                      onChange={(e) => handleLanguageChange(e.target.value)}
+                      className="bg-slate-800 text-indigo-300 text-xs font-mono font-bold rounded-lg px-2.5 py-1 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-400 cursor-pointer transition-colors"
+                    >
+                      {OOPS_LANGUAGES.map((lang) => (
+                        <option key={lang} value={lang} className="bg-slate-900 text-white font-mono">
+                          {lang}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 {/* Editor Textarea */}

@@ -93,7 +93,7 @@ export default function DBMSSqlEditor({
           <Terminal size={15} className="text-emerald-400" />
           <span className="text-xs font-bold text-slate-200 tracking-wide">{title}</span>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            Sandbox
+            SQL (PostgreSQL / MySQL)
           </span>
         </div>
 

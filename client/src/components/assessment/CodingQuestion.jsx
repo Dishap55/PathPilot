@@ -7,19 +7,29 @@ import { evaluateProblemSolution } from '../../utils/codeEvaluator';
 import { Play, CheckCircle2, XCircle } from 'lucide-react';
 
 export default function CodingQuestion({ question, code, onChange, preferredLanguage }) {
-  const lang = (preferredLanguage || question?.language || 'cpp').toLowerCase();
+  const [activeLang, setActiveLang] = useState((preferredLanguage || question?.language || 'cpp').toLowerCase());
 
-  const getInitialCode = () => {
-    if (question?.starterCode && typeof question.starterCode === 'object') {
-      return question.starterCode[lang] || question.starterCode['cpp'] || '// Write your solution here\n';
+  const supportedLanguages = question?.supportedLanguages || (question?.subject === 'DBMS' ? ['sql'] : ['cpp', 'java', 'python', 'javascript']);
+
+  const resolveStarter = (targetLang) => {
+    const l = (targetLang || 'cpp').toLowerCase().trim();
+    const starterObj = question?.starterCode || question?.starter_code;
+    if (!starterObj) return '// Write your solution here\n';
+    if (typeof starterObj === 'string') return starterObj;
+
+    for (const [k, v] of Object.entries(starterObj)) {
+      const key = k.toLowerCase().trim();
+      if (key === l) return v;
+      if ((l === 'cpp' || l === 'c++') && (key === 'cpp' || key === 'c++')) return v;
+      if (l === 'java' && key === 'java') return v;
+      if ((l === 'python' || l === 'py') && (key === 'python' || key === 'py')) return v;
+      if ((l === 'javascript' || l === 'js') && (key === 'javascript' || key === 'js')) return v;
+      if (l === 'sql' && key === 'sql') return v;
     }
-    if (question?.starter_code && typeof question.starter_code === 'object') {
-      return question.starter_code[lang] || question.starter_code['cpp'] || '// Write your solution here\n';
-    }
-    return question?.starterCode || question?.starter_code || '// Write your solution here\n';
+    return Object.values(starterObj)[0] || '// Write your solution here\n';
   };
 
-  const [currentCode, setCurrentCode] = useState(code || getInitialCode());
+  const [currentCode, setCurrentCode] = useState(code || resolveStarter(activeLang));
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
 
@@ -27,9 +37,18 @@ export default function CodingQuestion({ question, code, onChange, preferredLang
     if (code !== undefined) {
       setCurrentCode(code);
     } else {
-      setCurrentCode(getInitialCode());
+      setCurrentCode(resolveStarter(activeLang));
     }
-  }, [code, question, preferredLanguage]);
+  }, [code, question]);
+
+  const handleLanguageChange = (newLang) => {
+    setActiveLang(newLang);
+    const newStarter = resolveStarter(newLang);
+    setCurrentCode(newStarter);
+    if (onChange) {
+      onChange(newStarter);
+    }
+  };
 
   const handleCodeChange = (newCode) => {
     setCurrentCode(newCode);
@@ -46,13 +65,13 @@ export default function CodingQuestion({ question, code, onChange, preferredLang
       const evalResult = evaluateProblemSolution(
         question,
         currentCode,
-        preferredLanguage || question?.language || 'C++'
+        activeLang
       );
 
       try {
         await assessmentService.runCode(
           currentCode,
-          preferredLanguage || question?.language || 'C++'
+          activeLang
         );
       } catch (e) {}
 
@@ -85,12 +104,21 @@ export default function CodingQuestion({ question, code, onChange, preferredLang
     }
   };
 
+  const getExtension = (lang) => {
+    const l = (lang || '').toLowerCase();
+    if (l === 'python' || l === 'py') return 'py';
+    if (l === 'java') return 'java';
+    if (l === 'javascript' || l === 'js') return 'js';
+    if (l === 'sql') return 'sql';
+    return 'cpp';
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
-            DSA Coding Challenge ({preferredLanguage || question?.language || 'C++'})
+            DSA Coding Challenge ({activeLang.toUpperCase()})
           </span>
           <span className="text-xs text-slate-500 font-medium">Topic: {question?.topic || 'Algorithms'}</span>
         </div>
@@ -99,8 +127,21 @@ export default function CodingQuestion({ question, code, onChange, preferredLang
 
       <div className="border border-slate-700 rounded-xl overflow-hidden shadow-sm">
         <div className="bg-slate-800 px-4 py-2 text-xs text-slate-300 font-mono flex items-center justify-between">
-          <span>solution.{preferredLanguage === 'Python' ? 'py' : preferredLanguage === 'Java' ? 'java' : preferredLanguage === 'C' ? 'c' : preferredLanguage === 'JavaScript' ? 'js' : 'cpp'}</span>
-          <span>{preferredLanguage || question?.language || 'C++'}</span>
+          <span>solution.{getExtension(activeLang)}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-slate-400">Language:</span>
+            <select
+              value={activeLang}
+              onChange={(e) => handleLanguageChange(e.target.value)}
+              className="bg-slate-900 text-indigo-300 text-xs font-mono font-bold rounded px-2 py-0.5 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-400 cursor-pointer"
+            >
+              {supportedLanguages.map((l) => (
+                <option key={l} value={l} className="bg-slate-900 text-white font-mono">
+                  {l.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
         <textarea
           value={currentCode}

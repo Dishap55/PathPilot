@@ -25,6 +25,24 @@ const CONFIDENCE_LEVELS = [
   { id: 'very_confident', label: 'Very Confident', emoji: '🔥', color: 'hover:border-indigo-300 hover:bg-indigo-50/50' }
 ];
 
+function resolveStarterCode(starterCodeObj, lang) {
+  if (!starterCodeObj) return '';
+  if (typeof starterCodeObj === 'string') return starterCodeObj;
+  if (typeof starterCodeObj !== 'object') return '';
+
+  const l = (lang || '').toLowerCase().trim();
+  for (const [k, v] of Object.entries(starterCodeObj)) {
+    const key = k.toLowerCase().trim();
+    if (key === l) return v;
+    if ((l === 'cpp' || l === 'c++') && (key === 'cpp' || key === 'c++')) return v;
+    if (l === 'java' && key === 'java') return v;
+    if ((l === 'python' || l === 'py') && (key === 'python' || key === 'py')) return v;
+    if ((l === 'javascript' || l === 'js') && (key === 'javascript' || key === 'js')) return v;
+    if (l === 'sql' && key === 'sql') return v;
+  }
+  return Object.values(starterCodeObj)[0] || '';
+}
+
 export default function AssessmentQuestionCard({
   question,
   questionNumber = 1,
@@ -60,12 +78,9 @@ export default function AssessmentQuestionCard({
     setConfidence('confident');
     setRunOutput(null);
     setActiveTestCaseIndex(0);
-    if (question?.starterCode) {
-      if (typeof question.starterCode === 'string') {
-        setCode(question.starterCode);
-      } else if (typeof question.starterCode === 'object') {
-        setCode(question.starterCode[selectedLanguage] || Object.values(question.starterCode)[0] || '');
-      }
+    if (question?.starterCode || question?.starter_code) {
+      const starter = question.starterCode || question.starter_code;
+      setCode(resolveStarterCode(starter, selectedLanguage));
     } else {
       setCode('');
     }
@@ -126,8 +141,9 @@ export default function AssessmentQuestionCard({
 
   const handleLanguageChange = (newLang) => {
     setSelectedLanguage(newLang);
-    if (question?.starterCode && typeof question.starterCode === 'object') {
-      setCode(question.starterCode[newLang] || Object.values(question.starterCode)[0] || '');
+    const starter = question?.starterCode || question?.starter_code;
+    if (starter) {
+      setCode(resolveStarterCode(starter, newLang));
     }
   };
 
@@ -383,7 +399,7 @@ export default function AssessmentQuestionCard({
                 disabled={Boolean(feedbackState) || isSubmitting}
                 className="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
               >
-                {(question?.supportedLanguages || ['cpp', 'java', 'python', 'javascript']).map(lang => (
+                {(question?.supportedLanguages || (question?.subject === 'DBMS' ? ['sql'] : ['cpp', 'java', 'python', 'javascript'])).map(lang => (
                   <option key={lang} value={lang}>{lang.toUpperCase()}</option>
                 ))}
               </select>

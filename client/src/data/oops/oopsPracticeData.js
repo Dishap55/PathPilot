@@ -5561,25 +5561,36 @@ public:
     }
 }`,
       Python: `class Geometry:
-    # Simulated via arguments in Python
+    # 1. Circle
     def calculate_area_circle(self, radius: float) -> float:
-        return 3.14159 * radius * radius
+        # TODO: Return area of circle: 3.14159 * radius * radius
+        return 0.0
 
+    # 2. Rectangle
     def calculate_area_rect(self, width: float, height: float) -> float:
-        return width * height
+        # TODO: Return area of rectangle: width * height
+        return 0.0
 
+    # 3. Square
     def calculate_area_square(self, side: int) -> int:
-        return side * side`,
+        # TODO: Return area of square: side * side
+        return 0`,
       'C++': `class Geometry {
 public:
+    // 1. Circle
     double calculateArea(double radius) {
-        return 3.14159 * radius * radius;
+        // TODO: Return 3.14159 * radius * radius
+        return 0.0;
     }
+    // 2. Rectangle
     double calculateArea(double width, double height) {
-        return width * height;
+        // TODO: Return width * height
+        return 0.0;
     }
+    // 3. Square
     int calculateArea(int side) {
-        return side * side;
+        // TODO: Return side * side
+        return 0;
     }
 };`
     },
@@ -5619,7 +5630,7 @@ public class Car {
     private Engine engine;
 
     public Car(int hp) {
-        // TODO: Instantiate new Engine internally
+        // TODO: Instantiate new Engine internally (Strong Has-A Composition)
         this.engine = new Engine(hp);
     }
 
@@ -5634,18 +5645,19 @@ public class Car {
 
 class Car:
     def __init__(self, hp: int):
+        # TODO: Instantiate new Engine internally (Strong Has-A Composition)
         self.__engine = Engine(hp)
 
     def start(self) -> str:
-        # TODO: Return formatted string
-        return "Car started with " + str(self.__engine.hp) + " HP engine"`,
+        # TODO: Return formatted string: "Car started with " + str(self.__engine.hp) + " HP engine"
+        pass`,
       'C++': `#include <string>
 
 class Engine {
 private:
     int hp;
 public:
-    Engine(int h) : hp(h) {}
+    Engine(int h = 0) : hp(h) {}
     int getHp() const { return hp; }
 };
 
@@ -5655,8 +5667,8 @@ private:
 public:
     Car(int h) : engine(h) {}
     std::string start() {
-        // TODO: Return formatted string
-        return "Car started with " + std::to_string(engine.getHp()) + " HP engine";
+        // TODO: Return "Car started with " + std::to_string(engine.getHp()) + " HP engine"
+        return "";
     }
 };`
     },

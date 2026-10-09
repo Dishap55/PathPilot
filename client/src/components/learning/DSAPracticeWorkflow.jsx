@@ -765,9 +765,19 @@ export default function DSAPracticeWorkflow({ className = '', questionBank = TWO
                   <span className="text-xs font-bold text-slate-200">Solution Code Editor</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-indigo-300 border border-slate-700 font-semibold">
-                    {selectedLang}
-                  </span>
+                  <span className="text-[11px] font-semibold text-slate-400">Language:</span>
+                  <select
+                    id="dsa-editor-language-select"
+                    value={selectedLang}
+                    onChange={(e) => handleLanguageChange(e.target.value)}
+                    className="bg-slate-800 text-indigo-300 text-xs font-mono font-bold rounded-lg px-2.5 py-1 border border-slate-700 hover:border-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-400 cursor-pointer transition-colors"
+                  >
+                    {SUPPORTED_LANGUAGES.map((lang) => (
+                      <option key={lang.value} value={lang.value} className="bg-slate-900 text-white font-mono">
+                        {lang.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
