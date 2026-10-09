@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { resetThemeToLight } from '../contexts/ThemeContext.jsx';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
@@ -134,6 +135,7 @@ export const authService = {
    * Sign Out
    */
   logout: async () => {
+    resetThemeToLight();
     return await supabase.auth.signOut();
   },
 

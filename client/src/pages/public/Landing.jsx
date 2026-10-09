@@ -37,9 +37,19 @@ import HowItWorksSection from '../../components/common/HowItWorksSection.jsx';
 import ForStudentsSection from '../../components/common/ForStudentsSection.jsx';
 import AboutUsSection from '../../components/common/AboutUsSection.jsx';
 import Footer from '../../components/layout/Footer.jsx';
+import { useTheme } from '../../contexts/ThemeContext.jsx';
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
+
+  // The landing page is always presented in the clean, decided light mode
+  useEffect(() => {
+    if (theme !== 'light') {
+      setTheme('light');
+    }
+  }, [theme, setTheme]);
+
   const mainScrollRef = useRef(null);
   const [activeNav, setActiveNav] = useState('Home');
   const [hoveredNode, setHoveredNode] = useState(null);
@@ -211,7 +221,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full flex bg-slate-900 overflow-x-hidden font-sans select-none">
+    <div className="relative min-h-screen w-full flex bg-slate-50 overflow-x-hidden font-sans select-none">
       
       {/* Mobile Top Header (< 1024px) */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 px-4 py-3 flex items-center justify-between shadow-md">

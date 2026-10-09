@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { authService } from '../services/authService';
+import { resetThemeToLight, useTheme } from '../contexts/ThemeContext.jsx';
 
 export const AuthContext = createContext(null);
 
@@ -8,6 +9,7 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { resetTheme } = useTheme();
 
   useEffect(() => {
     // 1. Initial session check
@@ -28,6 +30,10 @@ export function AuthProvider({ children }) {
       console.log('[PATHPILOT_OAUTH] AUTH_EVENT', {
         event
       });
+      if (event === 'SIGNED_OUT') {
+        resetThemeToLight();
+        if (typeof resetTheme === 'function') resetTheme();
+      }
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -36,7 +42,7 @@ export function AuthProvider({ children }) {
     return () => {
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [resetTheme]);
 
   const login = async (email, password) => {
     return await authService.login({ email, password });
@@ -59,6 +65,10 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
+    resetThemeToLight();
+    if (typeof resetTheme === 'function') {
+      resetTheme();
+    }
     const { error } = await authService.logout();
     if (error) {
       console.error('[Supabase Auth] Error logging out:', error.message);

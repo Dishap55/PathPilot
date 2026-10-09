@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../contexts/ThemeContext';
 import Avatar from '../common/Avatar';
 import { Menu, LogOut } from 'lucide-react';
 
@@ -11,11 +12,26 @@ import { Menu, LogOut } from 'lucide-react';
  * - Brand logo & version pill
  * - Mobile navigation menu toggle
  * - Authenticated student status & avatar
- * - Accessible logout control
+ * - Accessible logout control (always resets to light mode and redirects to Landing)
  */
 
 export default function Navbar({ onToggleMobileMenu = () => {} }) {
   const { user, logout } = useAuth();
+  const { resetTheme } = useTheme();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      if (typeof resetTheme === 'function') {
+        resetTheme();
+      }
+      await logout();
+    } catch (err) {
+      console.error('[Navbar] Logout error:', err);
+    } finally {
+      navigate('/');
+    }
+  };
 
   return (
     <header className="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/70 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
@@ -60,7 +76,7 @@ export default function Navbar({ onToggleMobileMenu = () => {} }) {
             <Avatar name={user.user_metadata?.full_name || user.email} size="sm" />
 
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="p-1.5 sm:px-2.5 sm:py-1.5 text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50/60 rounded-xl transition-all flex items-center gap-1.5"
               title="Logout"
               aria-label="Sign out of PathPilot"

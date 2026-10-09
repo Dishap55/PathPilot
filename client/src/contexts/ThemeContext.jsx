@@ -23,13 +23,25 @@ function readSavedTheme() {
   return 'light';
 }
 
-function applyThemeToDocument(theme) {
+export function applyThemeToDocument(theme) {
   if (typeof document === 'undefined') return;
 
   const root = document.documentElement;
   root.dataset.theme = theme;
   root.classList.toggle('dark', theme === 'dark');
   root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+}
+
+export function resetThemeToLight() {
+  applyThemeToDocument('light');
+  try {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(THEME_STORAGE_KEY, 'light');
+      window.dispatchEvent(new CustomEvent('pathpilot_theme_reset', { detail: 'light' }));
+    }
+  } catch {
+    // Storage may be disabled by browser privacy settings. Keep the app usable.
+  }
 }
 
 export function ThemeProvider({ children }) {
@@ -52,6 +64,10 @@ export function ThemeProvider({ children }) {
     return true;
   }, []);
 
+  const resetTheme = useCallback(() => {
+    return setTheme('light');
+  }, [setTheme]);
+
   useEffect(() => {
     const handleStorage = (event) => {
       if (event.key !== THEME_STORAGE_KEY || !isThemeMode(event.newValue)) return;
@@ -59,11 +75,20 @@ export function ThemeProvider({ children }) {
       applyThemeToDocument(event.newValue);
     };
 
+    const handleCustomReset = () => {
+      setThemeState('light');
+      applyThemeToDocument('light');
+    };
+
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener('pathpilot_theme_reset', handleCustomReset);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('pathpilot_theme_reset', handleCustomReset);
+    };
   }, []);
 
-  const value = useMemo(() => ({ theme, setTheme, modes: THEME_MODES }), [theme, setTheme]);
+  const value = useMemo(() => ({ theme, setTheme, resetTheme, modes: THEME_MODES }), [theme, setTheme, resetTheme]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
