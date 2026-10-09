@@ -1,0 +1,42 @@
+{
+  "name": "pathpilot",
+  "version": "1.0.0",
+  "description": "PathPilot - AI-Powered Adaptive Learning & Placement Coach",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "backend"
+  ],
+  "scripts": {
+    "setup": "node scripts/setup.js",
+    "dev": "concurrently -n \"server,client\" -c \"cyan,green\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:all": "concurrently -n \"server,client\" -c \"cyan,green\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "npm run dev --workspace=client",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:backend": "node backend/server.js",
+    "build": "npm run build --workspaces --if-present",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js"
+  },
+  "keywords": [
+    "pathpilot",
+    "adaptive-learning",
+    "placement-prep",
+    "dsa",
+    "sql",
+    "gemini",
+    "n8n"
+  ],
+  "author": "CSIT Department | IPS Academy",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.4",
+    "express": "^5.2.1",
+    "helmet": "^8.3.0"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

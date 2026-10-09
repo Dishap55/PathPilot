@@ -1,0 +1,102 @@
+{
+  "name": "PathPilot - Wrong Answer Guidance",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wrong-answer-guidance",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract payload\nconst body = items[0].json.body;\nreturn [{ json: { context: body, prompt: `Provide a progressive hint without revealing the solution for student submission on question ${context.questionId}.` } }];"
+      },
+      "id": "2",
+      "name": "Prepare Context",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gemini-1.5-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "3",
+      "name": "Gemini Model Service",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Structure response according to PathPilot API schema\nconst result = items[0].json;\nreturn [{\n  json: {\n    success: true,\n    data: result,\n    meta: { timestamp: new Date().toISOString() }\n  }\n}];"
+      },
+      "id": "4",
+      "name": "Format Output",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Context": {
+      "main": [
+        [
+          {
+            "node": "Gemini Model Service",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Model Service": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "meta": {
+    "description": "Provides intelligent hints and same-logic practice recommendations upon incorrect attempts.",
+    "version": "1.0.0"
+  }
+}

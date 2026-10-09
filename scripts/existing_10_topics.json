@@ -1,0 +1,2213 @@
+{
+  "cpu-scheduling": [
+    {
+      "cardNumber": 1,
+      "badge": "1. Concept Definition",
+      "title": "What is CPU Scheduling?",
+      "definition": "CPU Scheduling is the OS mechanism by which the Short-Term Scheduler selects one process from the Ready Queue and allocates the CPU core for execution.",
+      "inSimpleWords": "Like a hospital triage nurse assigning the sole operating theatre to waiting patients based on urgency, arrival, or surgery length, the OS scheduler decides which program gets processor time.",
+      "whyInOS": "The CPU is the most expensive resource. Without scheduling, a single CPU-bound program would monopolize the core, rendering the computer completely unresponsive to user input.",
+      "keyTerms": [
+        {
+          "term": "Ready Queue",
+          "desc": "Queue of processes in main memory ready and waiting to execute on the CPU."
+        },
+        {
+          "term": "Dispatcher",
+          "desc": "Kernel module giving control of the CPU to the process selected by the short-term scheduler (performs context switch)."
+        },
+        {
+          "term": "Preemption",
+          "desc": "Involuntarily interrupting a running process when a higher-priority or timer-slice event occurs."
+        },
+        {
+          "term": "Throughput",
+          "desc": "The number of processes completed per unit time."
+        }
+      ],
+      "analogy": "A single checkout cashier at a supermarket managing a line of shoppers with varying cart sizes.",
+      "diagramType": "scheduling-queue"
+    },
+    {
+      "cardNumber": 2,
+      "badge": "2. The Core Problem",
+      "title": "Why do we need CPU Scheduling?",
+      "problem": "Multiple processes (browser, music player, compiler) demand CPU attention simultaneously on limited physical CPU cores.",
+      "whatGoesWrong": "Without scheduling, whichever process starts first holds the CPU until it explicitly yields or terminates. If a program enters an infinite loop, the entire OS hangs permanently.",
+      "osSolution": "The OS timer chip generates periodic hardware interrupts (e.g. every 10ms), returning control to the kernel scheduler to redistribute CPU time fairly among all runnable tasks.",
+      "benefit": "Maximizes CPU utilization (approaching 100%), provides sub-second interactive response times, and prevents starvation.",
+      "realWorldExample": "Playing YouTube in the background while typing in VS Code: both run seamlessly on 1 CPU core via millisecond-level scheduling slices.",
+      "examTakeaway": "The Short-Term Scheduler runs frequently (milliseconds) and must be lightning fast; the Long-Term Scheduler runs infrequently (seconds/minutes) and controls the degree of multiprogramming."
+    },
+    {
+      "cardNumber": 3,
+      "badge": "3. Core Mechanism",
+      "title": "How does CPU Scheduling Work?",
+      "mechanism": "The Short-Term Scheduler evaluates scheduling criteria whenever a process transitions between Running, Ready, and Waiting states.",
+      "diagramType": "cpu-scheduling-flow",
+      "vfxType": "cpu-scheduling-sim",
+      "stateTransitions": [
+        "1. Hardware Timer Interrupt fires or running process requests I/O",
+        "2. CPU Mode switches from User to Kernel (Ring 0)",
+        "3. Current process state saved to its Process Control Block (PCB)",
+        "4. Scheduler algorithm evaluates Ready Queue and picks candidate P_next",
+        "5. Dispatcher loads P_next PCB registers and switches back to User Mode"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Arrival in Ready Queue",
+          "desc": "New or unblocked processes enter the queue."
+        },
+        {
+          "step": 2,
+          "title": "Algorithm Evaluation",
+          "desc": "Criteria like burst time, priority, or time quantum evaluated."
+        },
+        {
+          "step": 3,
+          "title": "Dispatch & Context Switch",
+          "desc": "Registers, Program Counter, and stack pointers swapped."
+        },
+        {
+          "step": 4,
+          "title": "Execution Slice",
+          "desc": "Selected process runs until timer expires, I/O wait, or completion."
+        }
+      ]
+    },
+    {
+      "cardNumber": 4,
+      "badge": "4. Internal Architecture",
+      "title": "Internal Structure: Scheduler & Dispatcher",
+      "diagramType": "dispatcher-architecture",
+      "structureDetails": {
+        "Ready Queue": "Linked list or Fibonacci heap of PCB pointers sorted by scheduling criteria",
+        "Dispatcher Latency": "Time taken to stop one process, save state, and start another (typically 1–10 microseconds)",
+        "Timer Interrupt Chip": "Programmable Interval Timer (PIT / APIC) that generates periodic IRQ0 signals",
+        "Scheduling Metrics": "Arrival Time (AT), Burst Time (BT), Completion Time (CT), Turnaround Time (TAT), Waiting Time (WT)"
+      },
+      "componentRoles": "The scheduler selects WHO runs next; the dispatcher handles the low-level machine assembly mechanics of actually putting them ON the CPU."
+    },
+    {
+      "cardNumber": 5,
+      "badge": "5. Step-by-Step Execution",
+      "title": "Step-by-Step: The Preemption Lifecycle",
+      "scenario": "Process P1 is running when an I/O device finishes fetching data for higher-priority Process P2.",
+      "challenge": "P2 transitions from Waiting to Ready. The OS must decide whether to interrupt P1 immediately.",
+      "flowSteps": [
+        {
+          "num": 1,
+          "action": "I/O Interrupt Triggered",
+          "detail": "Disk controller raises hardware interrupt line."
+        },
+        {
+          "num": 2,
+          "action": "ISR Execution",
+          "detail": "Kernel Interrupt Service Routine moves P2 PCB from I/O queue to Ready queue."
+        },
+        {
+          "num": 3,
+          "action": "Preemption Check",
+          "detail": "Scheduler compares Priority(P2) with Priority(P1). P2 priority is higher."
+        },
+        {
+          "num": 4,
+          "action": "Save P1 Context",
+          "detail": "Dispatcher saves P1 registers, PC, and CPU flags into PCB_1."
+        },
+        {
+          "num": 5,
+          "action": "Restore P2 Context",
+          "detail": "Dispatcher loads PCB_2 registers and jumps to P2 saved Program Counter."
+        },
+        {
+          "num": 6,
+          "action": "User Mode Return",
+          "detail": "CPU drops to Ring 3; P2 executes with zero data corruption."
+        }
+      ],
+      "resolution": "High-priority task handles urgent data within microseconds while P1 safely pauses."
+    },
+    {
+      "cardNumber": 6,
+      "badge": "6. Numerical Walkthrough",
+      "title": "Numerical Example: Scheduling Metrics",
+      "isNumerical": true,
+      "question": "Calculate Completion Time (CT), Turnaround Time (TAT), Waiting Time (WT), and their averages for 3 processes under FCFS scheduling.",
+      "givenData": {
+        "Process P1": "Arrival Time (AT) = 0 ms, Burst Time (BT) = 5 ms",
+        "Process P2": "Arrival Time (AT) = 1 ms, Burst Time (BT) = 3 ms",
+        "Process P3": "Arrival Time (AT) = 2 ms, Burst Time (BT) = 4 ms"
+      },
+      "formula": "Turnaround Time (TAT) = CT - AT\nWaiting Time (WT) = TAT - BT",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "title": "Construct Gantt Chart",
+          "detail": "|--- P1 (0 to 5) ---|--- P2 (5 to 8) ---|--- P3 (8 to 12) ---|"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Calculate Completion Time (CT)",
+          "detail": "P1 completes at 5 ms. P2 completes at 8 ms. P3 completes at 12 ms."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Calculate Turnaround Time (TAT = CT - AT)",
+          "detail": "P1: 5 - 0 = 5 ms | P2: 8 - 1 = 7 ms | P3: 12 - 2 = 10 ms\nTotal TAT = 22 ms. Average TAT = 22 / 3 = 7.33 ms."
+        },
+        {
+          "stepNumber": 4,
+          "title": "Calculate Waiting Time (WT = TAT - BT)",
+          "detail": "P1: 5 - 5 = 0 ms | P2: 7 - 3 = 4 ms | P3: 10 - 4 = 6 ms\nTotal WT = 10 ms. Average WT = 10 / 3 = 3.33 ms."
+        }
+      ],
+      "finalAnswer": "Average Turnaround Time = 7.33 ms\nAverage Waiting Time = 3.33 ms"
+    },
+    {
+      "cardNumber": 7,
+      "badge": "7. Live Simulation",
+      "title": "Visual Simulation: Ready Queue & CPU",
+      "vfxType": "cpu-scheduling-sim",
+      "fullWorkingFlow": "Watch processes enter the Ready Queue based on arrival times. The scheduler dispatches them onto the CPU core, tracking execution in real time along the dynamic Gantt chart while accumulating waiting time counters.",
+      "visualControls": [
+        "play",
+        "step",
+        "reset"
+      ]
+    },
+    {
+      "cardNumber": 8,
+      "badge": "8. Common Pitfalls",
+      "title": "Common Mistakes & Traps",
+      "traps": [
+        {
+          "mistake": "Confusing Waiting Time (WT) with Turnaround Time (TAT)",
+          "correct": "Turnaround Time is the total lifetime in the system (CT - AT). Waiting Time is only the time spent idling in the ready queue (TAT - BT).",
+          "why": "Students often forget that execution time (BT) must be subtracted from the total time to get waiting time."
+        },
+        {
+          "mistake": "Assuming Response Time equals Waiting Time in all algorithms",
+          "correct": "In non-preemptive algorithms (FCFS), RT == WT. In preemptive algorithms (Round Robin, SRTF), RT is strictly (First Time CPU Allocated - AT), which is much smaller than WT.",
+          "why": "Round Robin gives fast initial response even if total waiting time is distributed over several quantum slices."
+        },
+        {
+          "mistake": "Believing Shortest Job First (SJF) is practically implementable as-is",
+          "correct": "Exact SJF cannot be implemented in general-purpose OS because the kernel cannot know the future CPU burst of a user program in advance. It is approximated using exponential moving averages.",
+          "why": "Interviewers love asking how Linux actually approximates SJF (tau_n+1 = alpha * t_n + (1 - alpha) * tau_n)."
+        }
+      ]
+    },
+    {
+      "cardNumber": 9,
+      "badge": "9. Interview Mastery",
+      "title": "Interview & Placement Angle",
+      "questions": [
+        {
+          "q": "What is the Convoy Effect and which scheduling algorithm suffers from it?",
+          "a": "The Convoy Effect occurs in FCFS when a long CPU-bound process holds the CPU while numerous short I/O-bound processes wait behind it in the ready queue. The I/O devices sit idle, destroying system throughput.",
+          "tip": "Always mention that Round Robin or Preemptive SJF resolves the Convoy Effect by slicing execution."
+        },
+        {
+          "q": "How does the OS choose the optimal Time Quantum in Round Robin?",
+          "a": "If the quantum is extremely large, RR degenerates into FCFS. If it is extremely small, CPU throughput collapses due to excessive context-switch overhead. The industry rule of thumb is that 80% of CPU bursts should be shorter than the time quantum (typically 10–100 ms).",
+          "tip": "Quote: Context switch time should be < 1% of the time quantum."
+        }
+      ]
+    },
+    {
+      "cardNumber": 10,
+      "badge": "10. Quick Revision",
+      "title": "Quick Revision & Cheat Sheet",
+      "cheatSheet": {
+        "keyRule": "SJF gives minimum average waiting time. Round Robin guarantees bounded response time.",
+        "summaryPoints": [
+          "Preemptive: CPU can be taken away involuntarily (SRTF, Round Robin, Preemptive Priority).",
+          "Non-Preemptive: Process holds CPU until it voluntarily terminates or calls I/O (FCFS, Non-preemptive SJF).",
+          "TAT = Completion Time - Arrival Time (CT - AT).",
+          "WT = Turnaround Time - Burst Time (TAT - BT).",
+          "Aging fixes starvation by gradually increasing process priority as it waits."
+        ],
+        "examShortcut": "In FCFS, the process with the largest burst arriving first causes highest average waiting time.",
+        "whenToUse": "Use Round Robin for interactive desktop/cloud environments; Multi-Level Feedback Queue (MLFQ) for general-purpose OS kernels like Linux and Windows."
+      }
+    }
+  ],
+  "processes": [
+    {
+      "cardNumber": 1,
+      "badge": "1. Concept Definition",
+      "title": "What is a Process?",
+      "definition": "A Process is an active program in execution. While a program is a passive binary file on disk, a process is dynamic with an allocated address space, stack, heap, and registers.",
+      "inSimpleWords": "A recipe book resting on a shelf is a program. You actively in the kitchen chopping onions and following the recipe is a process.",
+      "whyInOS": "Processes provide the primary abstraction of isolated execution. One process crashing must never corrupt another process or crash the underlying operating system.",
+      "keyTerms": [
+        {
+          "term": "Program Counter (PC)",
+          "desc": "CPU register containing the memory address of the next instruction to execute."
+        },
+        {
+          "term": "Process Control Block (PCB)",
+          "desc": "The kernel data structure storing all metadata for an active process."
+        },
+        {
+          "term": "Context Switch",
+          "desc": "Saving state of running process and restoring another to share the CPU."
+        },
+        {
+          "term": "Virtual Address Space",
+          "desc": "Isolated 32-bit (4GB) or 64-bit memory layout containing Text, Data, Heap, and Stack."
+        }
+      ],
+      "analogy": "A musical score sheet is the program; the orchestra actively playing the symphony is the process.",
+      "diagramType": "process-lifecycle"
+    },
+    {
+      "cardNumber": 2,
+      "badge": "2. The Core Problem",
+      "title": "Why do we need Process Isolation?",
+      "problem": "Early computing ran single programs with bare hardware access. If one student program had a bug, it overwrote memory and ruined other users' data.",
+      "whatGoesWrong": "A rogue loop or memory corruption in a web browser could overwrite system files, read private encryption keys from banking software, or halt the CPU.",
+      "osSolution": "Hardware dual-mode operation (User Mode vs Kernel Mode) and Virtual Memory address spaces ensure each process operates inside an untouchable sandbox.",
+      "benefit": "Fault tolerance, security, multitasking, and robust multitasking stability.",
+      "realWorldExample": "When a tab crashes in Google Chrome, only that individual render process dies; the browser window and other tabs keep running.",
+      "examTakeaway": "Processes have independent memory address spaces; threads within the same process share heap, global variables, and open files."
+    },
+    {
+      "cardNumber": 3,
+      "badge": "3. Core Mechanism",
+      "title": "The 5-State Process Lifecycle",
+      "mechanism": "A process transitions through 5 fundamental states managed by OS scheduler queues.",
+      "diagramType": "process-state-machine",
+      "vfxType": "process-state-sim",
+      "stateTransitions": [
+        "NEW -> READY: Admitted to RAM by Long-Term Scheduler",
+        "READY -> RUNNING: Dispatched by Short-Term Scheduler",
+        "RUNNING -> WAITING: Calls blocking I/O (e.g. read() or sleep())",
+        "WAITING -> READY: I/O or event completes (interrupt fired)",
+        "RUNNING -> READY: Timer quantum expires (preemption)",
+        "RUNNING -> TERMINATED: exit() syscall called, resources reclaimed"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "New",
+          "desc": "Process is being created; OS allocates PID and PCB."
+        },
+        {
+          "step": 2,
+          "title": "Ready",
+          "desc": "Loaded in RAM, waiting for CPU assignment."
+        },
+        {
+          "step": 3,
+          "title": "Running",
+          "desc": "Instructions being executed on the CPU core."
+        },
+        {
+          "step": 4,
+          "title": "Waiting (Blocked)",
+          "desc": "Waiting for an external event or I/O completion."
+        },
+        {
+          "step": 5,
+          "title": "Terminated",
+          "desc": "Execution ended; PCB held as zombie until parent collects status."
+        }
+      ]
+    },
+    {
+      "cardNumber": 4,
+      "badge": "4. Internal Architecture",
+      "title": "Internal Structure: Process Control Block (PCB)",
+      "diagramType": "pcb-layout",
+      "structureDetails": {
+        "Process ID (PID)": "Unique integer identifier assigned by OS kernel",
+        "Process State": "Current state (READY, RUNNING, WAITING, ZOMBIE)",
+        "Program Counter": "Memory address of next instruction to be fetched",
+        "CPU Registers": "Saved values of accumulator, index registers, stack pointer (SP)",
+        "CPU Scheduling Info": "Priority rank, remaining quantum, scheduling queue pointers",
+        "Memory Limits": "Base and limit registers or page table base pointer (CR3 register)",
+        "I/O Status / Open Files": "Array of file descriptors (0=stdin, 1=stdout, 2=stderr)"
+      },
+      "componentRoles": "The PCB is the kernel manifest of a process. A process does NOT exist without an active PCB in kernel memory."
+    },
+    {
+      "cardNumber": 5,
+      "badge": "5. Step-by-Step Execution",
+      "title": "Step-by-Step: The Context Switch",
+      "scenario": "Timer interrupt forces CPU switch from Process P1 to Process P2.",
+      "challenge": "P1 must be paused mid-computation without losing a single bit of register arithmetic.",
+      "flowSteps": [
+        {
+          "num": 1,
+          "action": "Timer Interrupt",
+          "detail": "Hardware raises interrupt; CPU pushes PC and flags to kernel stack."
+        },
+        {
+          "num": 2,
+          "action": "Save P1 Context",
+          "detail": "Kernel copies remaining general-purpose registers (RAX, RBX, RCX...) into P1 PCB."
+        },
+        {
+          "num": 3,
+          "action": "Update P1 State",
+          "detail": "P1 state set from RUNNING to READY; moved to tail of Ready Queue."
+        },
+        {
+          "num": 4,
+          "action": "Select P2",
+          "detail": "Scheduler picks P2 from Ready Queue; state set to RUNNING."
+        },
+        {
+          "num": 5,
+          "action": "Flush Memory MMU",
+          "detail": "CR3 register updated to point to P2 page table (flushes TLB unless ASID used)."
+        },
+        {
+          "num": 6,
+          "action": "Restore P2 Context",
+          "detail": "P2 saved registers and Program Counter loaded into CPU."
+        }
+      ],
+      "resolution": "P2 resumes execution seamlessly at the exact microsecond where it was earlier paused."
+    },
+    {
+      "cardNumber": 6,
+      "badge": "6. Technical Walkthrough",
+      "title": "Technical Deep Dive: fork() and exec()",
+      "isNumerical": false,
+      "question": "How does UNIX process creation work? Trace fork(), return values, and address space duplication.",
+      "givenData": {
+        "System Call": "pid_t pid = fork();",
+        "Return Value Parent": "Positive integer (Child PID)",
+        "Return Value Child": "0 (indicates success in child)",
+        "Return Value Error": "-1 (fork failed, no child created)"
+      },
+      "formula": "Child Process Count after n consecutive forks = 2^n - 1 children (2^n total processes)",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "title": "Address Space Cloning (Copy-On-Write)",
+          "detail": "fork() duplicates PCB and page tables. Modern OS uses Copy-On-Write (COW): physical pages are shared read-only until one process writes."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Divergent Branching",
+          "detail": "if (pid == 0) { /* Child code path */ } else { /* Parent code path */ }"
+        },
+        {
+          "stepNumber": 3,
+          "title": "execvp() Image Replacement",
+          "detail": "Child calls execvp(\"ls\", args). This wipes the child virtual memory and loads the new binary from disk."
+        },
+        {
+          "stepNumber": 4,
+          "title": "wait() Synchronization",
+          "detail": "Parent calls wait(NULL), blocking until child exits to prevent Zombie state."
+        }
+      ],
+      "finalAnswer": "fork() creates an exact duplicate process; exec() replaces address space with a new program."
+    },
+    {
+      "cardNumber": 7,
+      "badge": "7. Live Simulation",
+      "title": "Visual Simulation: Process State Transitions",
+      "vfxType": "process-state-sim",
+      "fullWorkingFlow": "Watch a process spawn into NEW, get admitted to READY, be scheduled to RUNNING on the CPU, block on I/O into WAITING, return to READY, and finally call exit() to TERMINATE and free memory.",
+      "visualControls": [
+        "play",
+        "step",
+        "reset"
+      ]
+    },
+    {
+      "cardNumber": 8,
+      "badge": "8. Common Pitfalls",
+      "title": "Common Mistakes & Traps",
+      "traps": [
+        {
+          "mistake": "Confusing Zombie Process with Orphan Process",
+          "correct": "A Zombie has finished executing (exit called) but still occupies an entry in the process table because its parent hasn't called wait(). An Orphan has a parent that died before it; it is adopted by init/systemd (PID 1).",
+          "why": "Top placement question. Zombies waste process table slots; orphans run happily under PID 1."
+        },
+        {
+          "mistake": "Believing fork() creates a thread",
+          "correct": "fork() creates a completely separate process with its own PID, independent virtual memory space, and separate file descriptor tables.",
+          "why": "Threads share address space; forked processes are isolated."
+        },
+        {
+          "mistake": "Assuming context switch performs useful application work",
+          "correct": "Context switch is pure system overhead. During the switch, no user instructions execute.",
+          "why": "Excessive context switches degrade system throughput."
+        }
+      ]
+    },
+    {
+      "cardNumber": 9,
+      "badge": "9. Interview Mastery",
+      "title": "Interview & Placement Angle",
+      "questions": [
+        {
+          "q": "What is Copy-On-Write (COW) and why is it crucial for fork() performance?",
+          "a": "Without COW, fork() would need to physically copy hundreds of megabytes of RAM from parent to child, only for exec() to immediately discard it. With COW, parent and child share the same physical pages marked read-only. A private copy of a page is only allocated when either process attempts to write to it.",
+          "tip": "Mention that COW reduces fork() execution time from milliseconds to microseconds."
+        },
+        {
+          "q": "How many times does printf(\"Hello\\n\") execute with 3 consecutive fork() calls?",
+          "a": "3 forks create 2^3 = 8 total processes. If printf is placed after the 3 forks, \"Hello\" prints 8 times.",
+          "tip": "If printf is without \\n before fork(), buffered stdout will duplicate, printing unexpectedly more times!"
+        }
+      ]
+    },
+    {
+      "cardNumber": 10,
+      "badge": "10. Quick Revision",
+      "title": "Quick Revision & Cheat Sheet",
+      "cheatSheet": {
+        "keyRule": "Process = Program in Execution. PCB = Kernel identity of process. Context Switch = Pure CPU overhead.",
+        "summaryPoints": [
+          "5 States: New, Ready, Running, Waiting, Terminated.",
+          "PCB contains PID, Program Counter, registers, memory limits, and open files.",
+          "fork() returns 0 to Child, Child PID to Parent, -1 on failure.",
+          "Zombie: Process dead, parent has not waited. Orphan: Parent dead, adopted by PID 1.",
+          "Context switch duration: 1 to 10 microseconds."
+        ],
+        "examShortcut": "Formula for total processes after n forks: 2^n. Total children created: 2^n - 1.",
+        "whenToUse": "Use separate processes when strong security and crash isolation are paramount (e.g. Chrome browser tabs, microservices)."
+      }
+    }
+  ],
+  "deadlocks": [
+    {
+      "cardNumber": 1,
+      "badge": "1. Concept Definition",
+      "title": "What is a Deadlock?",
+      "definition": "A Deadlock is a permanent freeze condition in which a set of concurrent processes are blocked forever because every process holds at least one resource and waits to acquire another resource held by another process in the set.",
+      "inSimpleWords": "A four-way traffic gridlock at an intersection where every car is waiting for the car in front to move, but no car can move because its exit is blocked by another.",
+      "whyInOS": "Operating systems manage shared hardware and software resources (printers, memory blocks, database locks). Without deadlock management, system components freeze unpredictably.",
+      "keyTerms": [
+        {
+          "term": "Resource Allocation Graph (RAG)",
+          "desc": "Directed graph where nodes are processes and resources; cycles indicate potential deadlocks."
+        },
+        {
+          "term": "Coffman Conditions",
+          "desc": "The 4 simultaneous conditions necessary and sufficient for deadlock to occur."
+        },
+        {
+          "term": "Safe State",
+          "desc": "A system state where there exists at least one sequence to finish all processes without deadlock."
+        },
+        {
+          "term": "Starvation vs Deadlock",
+          "desc": "Starvation is indefinite waiting (process may run eventually); deadlock is permanent blocking."
+        }
+      ],
+      "analogy": "Person A has the scissors and needs tape; Person B has the tape and needs scissors. Neither yields.",
+      "diagramType": "rag-deadlock"
+    },
+    {
+      "cardNumber": 2,
+      "badge": "2. The Core Problem",
+      "title": "Why do Deadlocks Occur? The 4 Coffman Conditions",
+      "problem": "When multiple threads or processes compete for exclusive non-shareable resources, circular dependencies emerge.",
+      "whatGoesWrong": "Without deadlock handling, threads sleep forever holding locks. Databases stop answering queries, server CPU drops to 0%, and memory leaks until hard reboot.",
+      "osSolution": "To prevent deadlocks, the OS must eliminate AT LEAST ONE of the 4 Coffman conditions, or use Banker's algorithm for avoidance.",
+      "benefit": "Guarantees reliable, unfreezable execution for multi-threaded applications and operating system kernels.",
+      "realWorldExample": "Thread 1 locks Table A then requests Table B; Thread 2 locks Table B then requests Table A. Instant database freeze.",
+      "examTakeaway": "All 4 Coffman conditions MUST hold simultaneously for deadlock to occur. Breaking just 1 condition completely prevents deadlock."
+    },
+    {
+      "cardNumber": 3,
+      "badge": "3. Core Mechanism",
+      "title": "The 4 Coffman Conditions in Action",
+      "mechanism": "Deadlock cannot exist unless all 4 conditions are true at the exact same moment.",
+      "diagramType": "coffman-conditions",
+      "vfxType": "deadlock-rag-sim",
+      "stateTransitions": [
+        "1. Mutual Exclusion: At least one resource held in non-shareable mode.",
+        "2. Hold and Wait: A process holds resources while requesting additional ones.",
+        "3. No Preemption: Resources cannot be forcibly taken away; must be released voluntarily.",
+        "4. Circular Wait: A closed chain P0 -> P1 -> P2 -> P0 where each waits for next."
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Mutual Exclusion",
+          "desc": "Only one process can use resource at a time (e.g. Mutex)."
+        },
+        {
+          "step": 2,
+          "title": "Hold & Wait",
+          "desc": "Process holds lock R1 while requesting lock R2."
+        },
+        {
+          "step": 3,
+          "title": "No Preemption",
+          "desc": "OS will not snatch R1 from Process until it finishes."
+        },
+        {
+          "step": 4,
+          "title": "Circular Wait",
+          "desc": "Cycle of requests and allocations forms an unbreakable ring."
+        }
+      ]
+    },
+    {
+      "cardNumber": 4,
+      "badge": "4. Internal Architecture",
+      "title": "Internal Structure: Resource Allocation Graph (RAG)",
+      "diagramType": "rag-components",
+      "structureDetails": {
+        "Process Node (Circle)": "Represents an active process or thread (P1, P2...)",
+        "Resource Node (Square/Box)": "Represents a resource type (R1, R2); dots inside indicate instance counts",
+        "Request Edge (P -> R)": "Directed edge from Process to Resource: process is waiting for allocation",
+        "Assignment Edge (R -> P)": "Directed edge from Resource dot to Process: resource is held by process",
+        "Cycle Rule": "If single instance per resource: Cycle == Deadlock. If multiple instances: Cycle != guaranteed Deadlock."
+      },
+      "componentRoles": "RAG is the mathematical foundation used by deadlock detection algorithms."
+    },
+    {
+      "cardNumber": 5,
+      "badge": "5. Step-by-Step Execution",
+      "title": "Step-by-Step: Deadlock Handling Strategies",
+      "scenario": "An enterprise OS handling concurrent file access requests.",
+      "challenge": "Balancing performance overhead against deadlock safety.",
+      "flowSteps": [
+        {
+          "num": 1,
+          "action": "Ostrich Algorithm (Ignorance)",
+          "detail": "Pretend deadlock never happens. Used by Linux & Windows for general user space because deadlock is rare and avoidance is expensive."
+        },
+        {
+          "num": 2,
+          "action": "Deadlock Prevention",
+          "detail": "Impose structural rules to invalidate 1 Coffman condition (e.g. enforce global lock ordering to kill Circular Wait)."
+        },
+        {
+          "num": 3,
+          "action": "Deadlock Avoidance",
+          "detail": "Use Banker's Algorithm: dynamically check if granting request keeps system in a Safe State."
+        },
+        {
+          "num": 4,
+          "action": "Deadlock Detection & Recovery",
+          "detail": "Periodically run cycle detection; abort a victim process or preempt its resources when deadlock found."
+        }
+      ],
+      "resolution": "Strict systems use prevention or avoidance; desktop OS relies on prevention in kernel and ignorance in user space."
+    },
+    {
+      "cardNumber": 6,
+      "badge": "6. Numerical Walkthrough",
+      "title": "Numerical Example: Banker's Algorithm Safe Sequence",
+      "isNumerical": true,
+      "question": "Given 5 processes (P0–P4) and 3 resource types (A, B, C), determine if the system is in a Safe State and find the Safe Sequence.",
+      "givenData": {
+        "Allocation Matrix": "P0=[0,1,0], P1=[2,0,0], P2=[3,0,2], P3=[2,1,1], P4=[0,0,2]",
+        "Max Matrix": "P0=[7,5,3], P1=[3,2,2], P2=[9,0,2], P3=[2,2,2], P4=[4,3,3]",
+        "Available Vector": "[3, 3, 2]"
+      },
+      "formula": "Need Matrix = Max Matrix - Allocation Matrix\nSafety Check: If Need_i <= Available, Process i executes and releases: Available = Available + Allocation_i",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "title": "Calculate Need Matrix (Max - Allocation)",
+          "detail": "Need:\nP0 = [7-0, 5-1, 3-0] = [7, 4, 3]\nP1 = [3-2, 2-0, 2-0] = [1, 2, 2]\nP2 = [9-3, 0-0, 2-2] = [6, 0, 0]\nP3 = [2-2, 2-1, 2-1] = [0, 1, 1]\nP4 = [4-0, 3-0, 3-2] = [4, 3, 1]"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Test P1 with Available [3, 3, 2]",
+          "detail": "Need(P1) = [1, 2, 2] <= Available [3, 3, 2] -> TRUE!\nP1 runs, finishes, releases allocation [2, 0, 0].\nNew Available = [3+2, 3+0, 2+0] = [5, 3, 2]."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Test P3 with Available [5, 3, 2]",
+          "detail": "Need(P3) = [0, 1, 1] <= Available [5, 3, 2] -> TRUE!\nP3 runs, finishes, releases allocation [2, 1, 1].\nNew Available = [5+2, 3+1, 2+1] = [7, 4, 3]."
+        },
+        {
+          "stepNumber": 4,
+          "title": "Test P0, P2, P4 with Updated Available",
+          "detail": "Need(P0) = [7, 4, 3] <= [7, 4, 3] -> P0 runs! Available becomes [7, 5, 3].\nNeed(P2) = [6, 0, 0] <= [7, 5, 3] -> P2 runs! Available becomes [10, 5, 5].\nNeed(P4) = [4, 3, 1] <= [10, 5, 5] -> P4 runs! Available becomes [10, 5, 7]."
+        }
+      ],
+      "finalAnswer": "System is in a SAFE STATE!\nSafe Sequence: < P1, P3, P0, P2, P4 > (or < P1, P3, P4, P0, P2 >)"
+    },
+    {
+      "cardNumber": 7,
+      "badge": "7. Live Simulation",
+      "title": "Visual Simulation: Circular Wait & RAG",
+      "vfxType": "deadlock-rag-sim",
+      "fullWorkingFlow": "Interact with processes requesting and holding resources. Watch request edges turn into assignment edges. Observe how introducing a circular request turns the graph red and triggers deadlock detection.",
+      "visualControls": [
+        "play",
+        "step",
+        "reset"
+      ]
+    },
+    {
+      "cardNumber": 8,
+      "badge": "8. Common Pitfalls",
+      "title": "Common Mistakes & Traps",
+      "traps": [
+        {
+          "mistake": "Assuming a cycle in a Resource Allocation Graph ALWAYS implies deadlock",
+          "correct": "A cycle guarantees deadlock ONLY if all resources have single instances. With multiple instances per resource, a cycle does NOT guarantee deadlock because an unaffected process may release instances.",
+          "why": "The #1 trick question in GATE and tech interviews."
+        },
+        {
+          "mistake": "Equating Unsafe State with Deadlock",
+          "correct": "An Unsafe State is NOT guaranteed deadlock; it merely means the OS cannot guarantee avoiding deadlock if all processes simultaneously demand their maximum claims.",
+          "why": "Deadlock is a subset of Unsafe states (Safe State -> Unsafe State -> Deadlock)."
+        },
+        {
+          "mistake": "Thinking Deadlock Prevention and Deadlock Avoidance are identical",
+          "correct": "Prevention invalidates 1 of 4 conditions statically at design time (e.g. lock ordering). Avoidance tracks runtime state dynamically using Banker's algorithm.",
+          "why": "Avoidance requires advance knowledge of maximum resource claims."
+        }
+      ]
+    },
+    {
+      "cardNumber": 9,
+      "badge": "9. Interview Mastery",
+      "title": "Interview & Placement Angle",
+      "questions": [
+        {
+          "q": "How do you practically prevent Circular Wait in enterprise backend systems?",
+          "a": "Impose a total global ordering on all locks (e.g. Lock 1 must always be acquired before Lock 2). If a thread requires multiple locks, it MUST acquire them in strictly increasing order of their numerical IDs.",
+          "tip": "Cite Java/C++ database transactions as the canonical production example."
+        },
+        {
+          "q": "Why isn't Banker's algorithm used in everyday operating system kernels?",
+          "a": "Banker's algorithm requires processes to declare their maximum resource requirements in advance, which real applications cannot accurately predict. Furthermore, running matrix safety checks on every malloc() or file open would create catastrophic CPU overhead.",
+          "tip": "Mention: Kernel developers choose Deadlock Prevention or the Ostrich Algorithm instead."
+        }
+      ]
+    },
+    {
+      "cardNumber": 10,
+      "badge": "10. Quick Revision",
+      "title": "Quick Revision & Cheat Sheet",
+      "cheatSheet": {
+        "keyRule": "Deadlock requires all 4 Coffman conditions. Break 1 condition = 0 deadlocks.",
+        "summaryPoints": [
+          "4 Conditions: Mutual Exclusion, Hold & Wait, No Preemption, Circular Wait.",
+          "Single-instance RAG: Cycle <=> Deadlock.",
+          "Multi-instance RAG: Cycle is a necessary condition, but NOT sufficient.",
+          "Banker's Formula: Need = Max - Allocation. If Need <= Available, execute and add Allocation.",
+          "Safe State guarantees at least one safe sequence exists."
+        ],
+        "examShortcut": "If Available >= Need for any process, that process is guaranteed to run and increase Available.",
+        "whenToUse": "Use lock hierarchy to prevent Circular Wait in multi-threaded microservices; use Banker's logic in safety-critical embedded avionics."
+      }
+    }
+  ],
+  "memory-management": [
+    {
+      "cardNumber": 1,
+      "badge": "1. Concept Definition",
+      "title": "What is Virtual Memory & Paging?",
+      "definition": "Paging is a memory management scheme that eliminates the need for contiguous allocation of physical memory by dividing logical memory into fixed-size Pages and physical RAM into Frames of the same size.",
+      "inSimpleWords": "Like a book divided into numbered pages of exactly 500 words each: chapter 1 might be printed on paper sheets #3, #12, and #99, but the index table lets you read it sequentially without noticing.",
+      "whyInOS": "Physical RAM is limited (e.g. 16GB) and gets fragmented. Virtual memory allows processes to run even if their memory footprint exceeds physical RAM, providing seamless multitasking.",
+      "keyTerms": [
+        {
+          "term": "Page & Frame",
+          "desc": "Page: Fixed-size block of virtual memory. Frame: Fixed-size block of physical RAM (typically 4KB)."
+        },
+        {
+          "term": "Page Table",
+          "desc": "Per-process data structure mapping Page Number to physical Frame Number."
+        },
+        {
+          "term": "Page Fault",
+          "desc": "Hardware trap raised by the MMU when a program accesses a valid virtual page not currently present in RAM."
+        },
+        {
+          "term": "TLB",
+          "desc": "Translation Lookaside Buffer: high-speed hardware cache for fast address translations."
+        }
+      ],
+      "analogy": "A library where books (processes) have page numbers, but the librarian can store individual paper pages on any open shelf frame across the building.",
+      "diagramType": "paging-mmu"
+    },
+    {
+      "cardNumber": 2,
+      "badge": "2. The Core Problem",
+      "title": "Why do we need Non-Contiguous Paging?",
+      "problem": "Contiguous allocation suffers from External Fragmentation: free RAM gets chopped into tiny scattered holes, none large enough to fit a new 100MB program even if total free RAM is 500MB.",
+      "whatGoesWrong": "Compaction (relocating running processes to consolidate free space) locks up the CPU for hundreds of milliseconds and crashes program pointers.",
+      "osSolution": "Paging breaks programs into 4KB chunks. ANY page can fit into ANY free physical frame anywhere in RAM. External fragmentation is completely eliminated!",
+      "benefit": "Zero external fragmentation, fast process allocation, memory protection via permission bits, and shared memory support.",
+      "realWorldExample": "Launching a 40GB video game on an 8GB RAM laptop: Virtual Memory loads only the active levels into RAM using Demand Paging.",
+      "examTakeaway": "Paging has ZERO External Fragmentation, but suffers from Internal Fragmentation on the very last page of a process (average 0.5 * Page Size)."
+    },
+    {
+      "cardNumber": 3,
+      "badge": "3. Core Mechanism",
+      "title": "Hardware Address Translation Flow",
+      "mechanism": "The CPU Memory Management Unit (MMU) splits every logical address into a Page Number (p) and an Offset (d).",
+      "diagramType": "address-translation",
+      "vfxType": "paging-translation-sim",
+      "stateTransitions": [
+        "1. CPU generates logical address = [Page Number (p) | Offset (d)]",
+        "2. MMU checks TLB cache for Page Number (p)",
+        "3. If TLB Hit: Frame Number (f) retrieved in ~1 nanosecond",
+        "4. If TLB Miss: MMU walks Page Table in RAM, fetches Frame Number (f)",
+        "5. Physical Address computed as: Physical Address = (f * Page_Size) + d"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Address Split",
+          "desc": "Given page size 4KB (2^12), lowest 12 bits are offset (d); remaining bits are page number (p)."
+        },
+        {
+          "step": 2,
+          "title": "Table Lookup",
+          "desc": "Index into Page Table at row p to read Frame Number f and valid bit."
+        },
+        {
+          "step": 3,
+          "title": "Frame Concat",
+          "desc": "Physical Frame Number combined with unchanged Offset d to access RAM."
+        }
+      ]
+    },
+    {
+      "cardNumber": 4,
+      "badge": "4. Internal Architecture",
+      "title": "Internal Structure: Page Table Entry (PTE)",
+      "diagramType": "pte-structure",
+      "structureDetails": {
+        "Frame Number": "Physical frame address bits (e.g. 20 bits for 4GB RAM with 4KB pages)",
+        "Valid / Invalid Bit (P)": "1 if page is currently resident in physical RAM; 0 if on disk (triggers Page Fault)",
+        "Dirty / Modified Bit (M)": "1 if page was written to in RAM (must be written back to disk on eviction)",
+        "Reference / Accessed Bit (R)": "1 if page was read/written recently (used by LRU / Second-Chance clock)",
+        "Protection Bits": "Read (R), Write (W), Execute (X) permissions (prevents code injection)"
+      },
+      "componentRoles": "The hardware MMU enforces page permissions directly; writing to a page marked Read-Only causes Segmentation Fault (SIGSEGV)."
+    },
+    {
+      "cardNumber": 5,
+      "badge": "5. Step-by-Step Execution",
+      "title": "Step-by-Step: The Page Fault Routine",
+      "scenario": "CPU attempts to read an instruction from Virtual Page 4, but Valid Bit is 0.",
+      "challenge": "The required code resides on the secondary SSD. The OS must bring it to RAM without crashing the process.",
+      "flowSteps": [
+        {
+          "num": 1,
+          "action": "MMU Trap",
+          "detail": "Hardware raises Page Fault Exception (Interrupt 14); CPU switches to Kernel Mode."
+        },
+        {
+          "num": 2,
+          "action": "Save State",
+          "detail": "Kernel saves current process registers and faulting address from CR2 register."
+        },
+        {
+          "num": 3,
+          "action": "Validity Check",
+          "detail": "OS verifies address is within process virtual address space limits (not an invalid pointer)."
+        },
+        {
+          "num": 4,
+          "action": "Locate Free Frame",
+          "detail": "Finds free RAM frame. If RAM full, runs Page Replacement (LRU) to evict a victim."
+        },
+        {
+          "num": 5,
+          "action": "Disk I/O",
+          "detail": "Issues disk read to load page from swap file into the allocated frame."
+        },
+        {
+          "num": 6,
+          "action": "Update PTE & Resume",
+          "detail": "Sets Valid Bit=1, writes Frame # into PTE, and restarts the EXACT faulting instruction."
+        }
+      ],
+      "resolution": "The process continues execution unaware that a 5-millisecond disk fetch took place."
+    },
+    {
+      "cardNumber": 6,
+      "badge": "6. Numerical Walkthrough",
+      "title": "Numerical Example: Address Translation & TLB EAT",
+      "isNumerical": true,
+      "question": "A system uses 32-bit logical addresses with 4 KB page size. (1) How many bits represent Page Number and Offset? (2) If TLB access time is 20 ns, Main Memory access time is 100 ns, and TLB hit ratio is 90%, calculate Effective Access Time (EAT).",
+      "givenData": {
+        "Logical Address Size": "32 bits (4 GB addressable space)",
+        "Page Size": "4 KB = 4096 bytes = 2^12 bytes",
+        "TLB Hit Ratio (h)": "0.90 (90%)",
+        "TLB Search Time (c)": "20 ns",
+        "Memory Access Time (m)": "100 ns"
+      },
+      "formula": "Offset Bits = log2(Page Size)\nPage Number Bits = Address Bits - Offset Bits\nEAT = h * (c + m) + (1 - h) * (c + 2*m)",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "title": "Calculate Offset and Page Bits",
+          "detail": "Offset bits d = log2(4096) = 12 bits.\nPage Number bits p = 32 - 12 = 20 bits.\nTotal pages in virtual address space = 2^20 = 1,048,576 pages (1M pages)."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Calculate Time on TLB Hit",
+          "detail": "Time_hit = c + m = 20 ns (TLB search) + 100 ns (RAM read) = 120 ns."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Calculate Time on TLB Miss",
+          "detail": "Time_miss = c + m + m = 20 ns (TLB check) + 100 ns (Page Table read in RAM) + 100 ns (Actual data read in RAM) = 220 ns."
+        },
+        {
+          "stepNumber": 4,
+          "title": "Compute Effective Access Time (EAT)",
+          "detail": "EAT = (0.90 * 120 ns) + (0.10 * 220 ns)\nEAT = 108 ns + 22 ns = 130 ns."
+        }
+      ],
+      "finalAnswer": "Offset = 12 bits, Page Number = 20 bits\nEffective Access Time (EAT) = 130 ns"
+    },
+    {
+      "cardNumber": 7,
+      "badge": "7. Live Simulation",
+      "title": "Visual Simulation: Page Table & Memory Access",
+      "vfxType": "paging-translation-sim",
+      "fullWorkingFlow": "Input a virtual hexadecimal address. Watch the MMU split it into Page Number and Offset. Step through the TLB check, observe Hit vs Miss paths, trace the frame lookup in physical RAM, and inspect the resulting byte.",
+      "visualControls": [
+        "play",
+        "step",
+        "reset"
+      ]
+    },
+    {
+      "cardNumber": 8,
+      "badge": "8. Common Pitfalls",
+      "title": "Common Mistakes & Traps",
+      "traps": [
+        {
+          "mistake": "Confusing Page Fault with Segmentation Fault",
+          "correct": "A Page Fault is a normal hardware interrupt when a valid page is on disk instead of RAM. A Segmentation Fault (SIGSEGV) is an illegal memory access violation (e.g. dereferencing NULL or writing to read-only code).",
+          "why": "Page faults are handled silently by the OS; Segmentation faults kill the program."
+        },
+        {
+          "mistake": "Believing Belady's Anomaly occurs in LRU and Optimal algorithms",
+          "correct": "Belady's Anomaly (more frames resulting in MORE page faults) occurs ONLY in FIFO. Stack algorithms like LRU and Optimal are mathematically immune to Belady's Anomaly.",
+          "why": "In LRU, the set of pages in an n-frame memory is always a strict subset of an (n+1)-frame memory."
+        },
+        {
+          "mistake": "Forgetting that single-level page tables for 32-bit systems require 4MB of RAM per process",
+          "correct": "2^20 pages * 4 bytes per PTE = 4 MB per page table. For 100 processes, that is 400 MB wasted! This is why modern OS uses Multi-Level Paging or Inverted Page Tables.",
+          "why": "Top question when testing scalability of memory architecture."
+        }
+      ]
+    },
+    {
+      "cardNumber": 9,
+      "badge": "9. Interview Mastery",
+      "title": "Interview & Placement Angle",
+      "questions": [
+        {
+          "q": "What is Thrashing in Virtual Memory and how does the OS detect and cure it?",
+          "a": "Thrashing occurs when the sum of working sets of all processes exceeds physical RAM. Processes spend virtually 100% of their time waiting for disk page swapping rather than executing CPU instructions. The OS cures it using the Working Set Model or by temporarily swapping out (suspending) an entire process to free frames.",
+          "tip": "Mention: High page fault rate + CPU utilization dropping near 0% is the textbook signature of Thrashing."
+        },
+        {
+          "q": "Why must the Page Size always be an exact power of 2?",
+          "a": "Hardware address splitting: If page size is 2^k, the lowest k bits of the binary address directly represent the offset, and the upper bits represent the page number. Splitting requires zero division arithmetic—just bitwise masking!",
+          "tip": "Show: (Address >> k) gives page number; (Address & ((1 << k) - 1)) gives offset."
+        }
+      ]
+    },
+    {
+      "cardNumber": 10,
+      "badge": "10. Quick Revision",
+      "title": "Quick Revision & Cheat Sheet",
+      "cheatSheet": {
+        "keyRule": "Paging cures External Fragmentation. Stack algorithms (LRU, Optimal) never suffer Belady's Anomaly.",
+        "summaryPoints": [
+          "Page Size = Frame Size (typically 4 KB = 2^12 bytes).",
+          "Offset bits d = log2(Page Size). Remaining bits = Page Number p.",
+          "Physical Address = (Frame Number * Page Size) + Offset.",
+          "Internal fragmentation occurs only on the last page (average = Page Size / 2).",
+          "EAT = h * (c + m) + (1 - h) * (c + 2m)."
+        ],
+        "examShortcut": "In LRU numericals, draw the frame state vertically and evict the item furthest to the left in historical reference string.",
+        "whenToUse": "Modern OS pairs hardware Paging with TLB and Demand Paging to create an illusion of limitless contiguous memory."
+      }
+    }
+  ],
+  "threads": [
+    {
+      "cardNumber": 1,
+      "badge": "1. Concept Definition",
+      "title": "What is a Thread?",
+      "definition": "A Thread is the smallest schedulable execution unit of CPU activity within a process. Multiple threads inside the same process share the text, data, heap, and open files, while keeping private stacks and registers.",
+      "inSimpleWords": "A process is an entire restaurant kitchen; threads are the individual chefs sharing the pantry, spices, and stoves while working simultaneously on different orders.",
+      "whyInOS": "Creating separate processes for every parallel task is too expensive (megabytes of memory and heavy context switching). Threads allow lightweight parallelism with near-zero communication latency.",
+      "keyTerms": [
+        {
+          "term": "Thread Control Block (TCB)",
+          "desc": "Kernel structure holding thread ID, program counter, registers, and stack pointer."
+        },
+        {
+          "term": "Race Condition",
+          "desc": "Flaw where outcome depends on unpredictable order of concurrent thread execution."
+        },
+        {
+          "term": "Critical Section",
+          "desc": "Code block accessing shared resources that must not be concurrently executed by multiple threads."
+        },
+        {
+          "term": "Mutex & Semaphore",
+          "desc": "Synchronization primitives enforcing Mutual Exclusion on shared memory."
+        }
+      ],
+      "analogy": "Multiple tabs in a text editor sharing the open file cache, each thread handling auto-save, syntax highlighting, and spelling check.",
+      "diagramType": "thread-process-model"
+    },
+    {
+      "cardNumber": 2,
+      "badge": "2. The Core Problem",
+      "title": "Why do we need Synchronization Primitives?",
+      "problem": "When multiple threads concurrently modify shared memory (e.g. `counter++`), the non-atomic machine instructions interleave, corrupting data.",
+      "whatGoesWrong": "At machine assembly level, `counter++` is 3 instructions: LOAD RAX, ADD 1, STORE. If thread context switch happens mid-way, updates are lost (e.g. 1000 + 1000 ends up as 1240).",
+      "osSolution": "Hardware atomic instructions (Test-and-Set, Compare-and-Swap) power OS Mutex locks and Semaphores to enforce mutual exclusion.",
+      "benefit": "Data integrity, deterministic calculations, and thread-safe concurrent data structures.",
+      "realWorldExample": "Two concurrent bank ATM withdrawals of $500 on a $600 account: without mutex locking, both read $600 and dispense $1000 total!",
+      "examTakeaway": "The Critical Section problem requires 3 criteria: Mutual Exclusion (must), Progress (must), and Bounded Waiting (no starvation)."
+    },
+    {
+      "cardNumber": 3,
+      "badge": "3. Core Mechanism",
+      "title": "How Semaphores Work: wait() & signal()",
+      "mechanism": "A Semaphore is an integer variable S accessed solely via two atomic operations: wait() (also called P) and signal() (also called V).",
+      "diagramType": "semaphore-operation",
+      "vfxType": "semaphore-sim",
+      "stateTransitions": [
+        "wait(S): while (S <= 0) block thread in waiting queue; S = S - 1",
+        "CRITICAL SECTION: Single thread executes safe access to shared memory",
+        "signal(S): S = S + 1; unblock one waiting thread from queue",
+        "Counting Semaphore: Initialized to N (permits N concurrent resource users)",
+        "Binary Semaphore (Mutex): Initialized to 1 (enforces strict 1-thread mutual exclusion)"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Acquire Permit",
+          "desc": "Thread calls wait(sem); if token count > 0, decrements and enters."
+        },
+        {
+          "step": 2,
+          "title": "Safe Access",
+          "desc": "Thread reads/writes shared memory without interference."
+        },
+        {
+          "step": 3,
+          "title": "Release Permit",
+          "desc": "Thread calls signal(sem); increments counter and wakes next sleeper."
+        }
+      ]
+    },
+    {
+      "cardNumber": 4,
+      "badge": "4. Internal Architecture",
+      "title": "Process vs Thread Memory Layout",
+      "diagramType": "thread-memory-layout",
+      "structureDetails": {
+        "Shared between Threads": "Code (Text) Segment, Data Segment (Globals), Heap Memory, Open File Descriptors, Signal Handlers",
+        "Private per Thread": "Thread ID (TID), Program Counter (PC), CPU Register State, Call Stack (Local variables)",
+        "User-Level Threads (ULT)": "Managed by user-space library (pthread); fast switching, but kernel blocks all threads if one blocks",
+        "Kernel-Level Threads (KLT)": "Managed directly by OS kernel; true multi-core hardware parallelism, slightly heavier switch"
+      },
+      "componentRoles": "Because heap is shared, threads can exchange pointers instantly without kernel IPC copying."
+    },
+    {
+      "cardNumber": 5,
+      "badge": "5. Step-by-Step Execution",
+      "title": "Step-by-Step: The Producer-Consumer Pattern",
+      "scenario": "A Producer thread adds items to a bounded buffer of size N while Consumer threads remove items.",
+      "challenge": "Producer must pause when buffer is FULL; Consumer must pause when buffer is EMPTY.",
+      "flowSteps": [
+        {
+          "num": 1,
+          "action": "Initialize Semaphores",
+          "detail": "mutex = 1 (lock), empty = N (free slots), full = 0 (available items)."
+        },
+        {
+          "num": 2,
+          "action": "Producer Flow",
+          "detail": "Calls wait(empty) -> wait(mutex) -> Add item to buffer -> signal(mutex) -> signal(full)."
+        },
+        {
+          "num": 3,
+          "action": "Buffer Full State",
+          "detail": "When empty==0, next producer calling wait(empty) sleeps in wait queue."
+        },
+        {
+          "num": 4,
+          "action": "Consumer Flow",
+          "detail": "Calls wait(full) -> wait(mutex) -> Remove item from buffer -> signal(mutex) -> signal(empty)."
+        },
+        {
+          "num": 5,
+          "action": "Wakeup Trigger",
+          "detail": "Consumer signal(empty) wakes the sleeping producer to continue."
+        }
+      ],
+      "resolution": "Zero race conditions, zero buffer overflows, zero buffer underflows."
+    },
+    {
+      "cardNumber": 6,
+      "badge": "6. Technical Walkthrough",
+      "title": "Technical Deep Dive: The Critical Section Race Condition",
+      "isNumerical": false,
+      "question": "Demonstrate assembly-level race conditions on a shared variable and explain how Peterson's algorithm solves it for 2 processes.",
+      "givenData": {
+        "Shared Memory": "int balance = 100;",
+        "Thread A": "balance = balance + 10;",
+        "Thread B": "balance = balance - 20;",
+        "Expected Final Balance": "100 + 10 - 20 = 90"
+      },
+      "formula": "Peterson's Flags: flag[i] = true; turn = j;\nwhile (flag[j] && turn == j) { /* busy wait */ }",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "title": "Assembly Expansion",
+          "detail": "Thread A does: (1) MOV EAX, [balance] (2) ADD EAX, 10 (3) MOV [balance], EAX\nThread B does: (1) MOV EBX, [balance] (2) SUB EBX, 20 (3) MOV [balance], EBX"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Interleaved Execution Tracing",
+          "detail": "A1 loads EAX=100. Context switch!\nB1 loads EBX=100. B2 calculates EBX=80. B3 stores balance=80. Context switch!\nA2 calculates EAX=110. A3 stores balance=110!"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Result of Race Condition",
+          "detail": "Final balance = 110! Thread B's withdrawal of $20 was completely erased from history."
+        },
+        {
+          "stepNumber": 4,
+          "title": "Peterson's Solution Verification",
+          "detail": "Mutual Exclusion: Both cannot be in CS because turn cannot be 0 and 1 simultaneously.\nProgress & Bounded Waiting satisfied."
+        }
+      ],
+      "finalAnswer": "Atomic mutex locking prevents register interleaving, guaranteeing deterministic value = 90."
+    },
+    {
+      "cardNumber": 7,
+      "badge": "7. Live Simulation",
+      "title": "Visual Simulation: Thread Synchronization",
+      "vfxType": "semaphore-sim",
+      "fullWorkingFlow": "Run concurrent Producer and Consumer threads on an interactive bounded buffer. Watch semaphore counters (empty, full, mutex) update in real time. Observe how threads block when the buffer fills and awaken on signal().",
+      "visualControls": [
+        "play",
+        "step",
+        "reset"
+      ]
+    },
+    {
+      "cardNumber": 8,
+      "badge": "8. Common Pitfalls",
+      "title": "Common Mistakes & Traps",
+      "traps": [
+        {
+          "mistake": "Reversing wait() operations in Producer-Consumer (Deadlock trap)",
+          "correct": "Calling wait(mutex) BEFORE wait(empty) causes DEADLOCK if the buffer is full! The producer holds the mutex and sleeps waiting for empty, while the consumer cannot acquire the mutex to free an empty slot.",
+          "why": "Golden interview question: ALWAYS wait on counting semaphore BEFORE acquiring the mutex."
+        },
+        {
+          "mistake": "Confusing Mutex with Binary Semaphore",
+          "correct": "A Mutex has OWNERSHIP: only the thread that locked the mutex can unlock it. A Binary Semaphore has no ownership: Thread A can wait() and Thread B can signal().",
+          "why": "Mutexes are for mutual exclusion; Semaphores are for signaling/synchronization."
+        },
+        {
+          "mistake": "Assuming spinlocks are always worse than sleeping mutexes",
+          "correct": "On multi-core systems, if the critical section is extremely short (< few microseconds), a spinlock is FASTER than a mutex because it avoids the heavy overhead of two context switches.",
+          "why": "Linux kernel uses spinlocks extensively in interrupt handlers."
+        }
+      ]
+    },
+    {
+      "cardNumber": 9,
+      "badge": "9. Interview Mastery",
+      "title": "Interview & Placement Angle",
+      "questions": [
+        {
+          "q": "What are the 3 mandatory requirements for any solution to the Critical Section problem?",
+          "a": "1. Mutual Exclusion: If process Pi is executing in its critical section, no other processes can be executing in their critical sections.\n2. Progress: If no process is in critical section, only processes wanting to enter can participate in deciding who enters next (no deadlock).\n3. Bounded Waiting: A bound must exist on the number of times other processes are allowed to enter after a process has requested entry (no starvation).",
+          "tip": "Hardware instructions like TestAndSet or CAS satisfy all three with appropriate queueing."
+        },
+        {
+          "q": "What is Priority Inversion and how is it resolved?",
+          "a": "Priority Inversion occurs when a low-priority thread holds a lock needed by a high-priority thread, but a medium-priority thread preempts the low-priority thread, indirectly starving the high-priority thread! It is resolved via Priority Inheritance: the low-priority thread temporarily inherits the high-priority rank until it releases the lock.",
+          "tip": "Mention the Mars Pathfinder spacecraft 1997 real-time system failure that was saved by priority inheritance."
+        }
+      ]
+    },
+    {
+      "cardNumber": 10,
+      "badge": "10. Quick Revision",
+      "title": "Quick Revision & Cheat Sheet",
+      "cheatSheet": {
+        "keyRule": "Threads share Heap & Code, but keep private Stacks. Lock order must avoid inversion and deadlock.",
+        "summaryPoints": [
+          "Threads are lightweight: fast creation, cheap context switch compared to processes.",
+          "Critical Section requires: Mutual Exclusion, Progress, Bounded Waiting.",
+          "Counting Semaphore initialized to N; Binary Semaphore initialized to 1.",
+          "wait() decrements; signal() increments.",
+          "Producer-Consumer: wait(empty) BEFORE wait(mutex) to prevent deadlock."
+        ],
+        "examShortcut": "If asked how many threads can be in critical section protected by semaphore S: exactly 1 for binary mutex; at most S_initial.",
+        "whenToUse": "Use multi-threading for I/O concurrency (web servers, UI event loops) and compute-bound matrix math on multi-core CPUs."
+      }
+    }
+  ],
+  "file-systems": [
+    {
+      "cardNumber": 1,
+      "badge": "1. Concept Definition",
+      "title": "What is a File System & Inode?",
+      "definition": "A File System is the OS subsystem that translates abstract file operations (open, read, write) into physical block reads/writes on non-volatile secondary storage (SSDs, HDDs).",
+      "inSimpleWords": "A vast warehouse storage unit filled with numbered shipping containers. The file system is the master catalog indexing which cargo belongs to which customer.",
+      "whyInOS": "Disk hardware only understands raw sector offsets (e.g. \"read sector 49204\"). The file system gives humans names, hierarchical directories, permissions, and integrity.",
+      "keyTerms": [
+        {
+          "term": "Inode (Index Node)",
+          "desc": "Unix filesystem structure storing all file metadata (size, owner, permissions) and pointers to data blocks."
+        },
+        {
+          "term": "Directory Entry",
+          "desc": "A mapping of human-readable filename to its unique inode number."
+        },
+        {
+          "term": "Disk Scheduling",
+          "desc": "Algorithms optimizing read/write head movement across disk cylinders (SCAN, C-SCAN, LOOK)."
+        },
+        {
+          "term": "Virtual File System (VFS)",
+          "desc": "Kernel abstraction layer allowing ext4, NTFS, and FAT32 to present a unified API."
+        }
+      ],
+      "analogy": "A library index card: it lists title, author, and shelf coordinates, but does not contain the story text itself.",
+      "diagramType": "inode-tree"
+    },
+    {
+      "cardNumber": 2,
+      "badge": "2. The Core Problem",
+      "title": "Why do we need Block Allocation & Disk Scheduling?",
+      "problem": "Storage devices have physical latency: magnetic heads take milliseconds to physically seek across tracks, and files grow unpredictably over time.",
+      "whatGoesWrong": "Contiguous allocation causes massive external fragmentation. Naive FCFS disk scheduling causes the read head to wildly thrash back and forth across platters.",
+      "osSolution": "Indexed allocation (Inodes) handles scattered blocks without fragmentation; elevator disk scheduling (SCAN / LOOK) sweeps the head smoothly in one direction.",
+      "benefit": "Drastically reduces seek latency, prevents data corruption, and maximizes storage throughput.",
+      "realWorldExample": "Loading 100 photo thumbnails in a folder: LOOK scheduling groups nearby sectors together into a single continuous sweep.",
+      "examTakeaway": "The filename is NOT stored inside the Inode! The filename is stored in the Directory file alongside the Inode Number."
+    },
+    {
+      "cardNumber": 3,
+      "badge": "3. Core Mechanism",
+      "title": "How UNIX Inodes Address Files",
+      "mechanism": "A classic Unix inode contains 15 pointers: 12 Direct Pointers, 1 Single Indirect, 1 Double Indirect, and 1 Triple Indirect Pointer.",
+      "diagramType": "inode-structure",
+      "vfxType": "disk-head-sim",
+      "stateTransitions": [
+        "Direct Pointers (0–11): Point directly to data blocks (fast access for small files < 48KB)",
+        "Single Indirect: Points to a block containing pointers to data blocks",
+        "Double Indirect: Points to a block containing pointers to single indirect blocks",
+        "Triple Indirect: Multi-tier tree allowing multi-terabyte file addressing"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Direct Access",
+          "desc": "First 12 blocks read in 1 disk operation each."
+        },
+        {
+          "step": 2,
+          "title": "Indirect Expansion",
+          "desc": "Large files expand dynamically into indirect pointer trees."
+        },
+        {
+          "step": 3,
+          "title": "No Reallocation",
+          "desc": "Files can grow to gigabytes without moving existing blocks."
+        }
+      ]
+    },
+    {
+      "cardNumber": 4,
+      "badge": "4. Internal Architecture",
+      "title": "Internal Structure: Inode Metadata Fields",
+      "diagramType": "inode-fields",
+      "structureDetails": {
+        "File Mode & Type": "Regular file, Directory, Symbolic Link, Socket, FIFO (16 bits)",
+        "Link Count": "Number of hard links pointing to this inode (file deleted when count reaches 0)",
+        "User & Group ID": "Owner UID and GID for POSIX permission evaluation",
+        "File Size": "Size in bytes (64 bits)",
+        "Timestamps": "atime (access), mtime (modification), ctime (inode status change)",
+        "Block Pointers": "Array of 15 block pointers (Direct + Indirect tiers)"
+      },
+      "componentRoles": "Deleting a file (rm) actually calls unlink(): it decrements link count. The blocks are only freed when link count hits 0 and no process holds an open file descriptor."
+    },
+    {
+      "cardNumber": 5,
+      "badge": "5. Step-by-Step Execution",
+      "title": "Step-by-Step: Path Resolution `/home/user/doc.txt`",
+      "scenario": "Application calls `open(\"/home/user/doc.txt\", O_RDONLY)`.",
+      "challenge": "Resolving nested path strings into physical disk blocks across the storage hierarchy.",
+      "flowSteps": [
+        {
+          "num": 1,
+          "action": "Read Root Inode",
+          "detail": "Kernel opens root directory `/` (fixed well-known Inode 2 in ext4)."
+        },
+        {
+          "num": 2,
+          "action": "Find `home` Entry",
+          "detail": "Scans directory entries in Inode 2 data blocks to find `home` -> reads Inode 128."
+        },
+        {
+          "num": 3,
+          "action": "Find `user` Entry",
+          "detail": "Reads Inode 128 data blocks; locates directory entry `user` -> Inode 512."
+        },
+        {
+          "num": 4,
+          "action": "Find `doc.txt` Entry",
+          "detail": "Reads Inode 512 data blocks; locates `doc.txt` -> Inode 1024."
+        },
+        {
+          "num": 5,
+          "action": "Permission & Handle",
+          "detail": "Checks user read permissions on Inode 1024; creates File Descriptor in process PCB."
+        }
+      ],
+      "resolution": "Returns integer file descriptor (e.g. fd=3) for fast subsequent read() calls."
+    },
+    {
+      "cardNumber": 6,
+      "badge": "6. Numerical Walkthrough",
+      "title": "Numerical Example: Disk Scheduling (LOOK vs SCAN vs FCFS)",
+      "isNumerical": true,
+      "question": "A disk queue has cylinder requests: 98, 183, 37, 122, 14, 124, 65, 67. The head is currently at cylinder 53, moving toward larger cylinders. Total cylinders = 200 (0–199). Calculate Total Head Movement for (1) FCFS and (2) LOOK.",
+      "givenData": {
+        "Queue Requests": "[98, 183, 37, 122, 14, 124, 65, 67]",
+        "Initial Head Position": "53",
+        "Head Direction": "Moving UP toward higher numbers",
+        "Disk Cylinders": "0 to 199"
+      },
+      "formula": "Total Head Movement = Sum of |Current Cylinder - Next Cylinder|",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "title": "FCFS Calculation",
+          "detail": "Path: 53 -> 98 -> 183 -> 37 -> 122 -> 14 -> 124 -> 65 -> 67\nMovements: |98-53| + |183-98| + |37-183| + |122-37| + |14-122| + |124-14| + |65-124| + |67-65|\n= 45 + 85 + 146 + 85 + 108 + 110 + 59 + 2 = 640 cylinders!"
+        },
+        {
+          "stepNumber": 2,
+          "title": "LOOK Algorithm Strategy",
+          "detail": "LOOK moves in current direction servicing requests until the LAST request in that direction, then reverses. It does NOT go all the way to cylinder 199 (unlike SCAN)."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Trace LOOK Traversal",
+          "detail": "Ascending requests >= 53: 65, 67, 98, 122, 124, 183.\nDescending requests < 53: 37, 14.\nSequence: 53 -> 65 -> 67 -> 98 -> 122 -> 124 -> 183 -> 37 -> 14."
+        },
+        {
+          "stepNumber": 4,
+          "title": "Calculate LOOK Total Movement",
+          "detail": "Ascending leg: 183 - 53 = 130 cylinders.\nDescending leg: 183 - 14 = 169 cylinders.\nTotal Head Movement = 130 + 169 = 299 cylinders."
+        }
+      ],
+      "finalAnswer": "FCFS Total Head Movement = 640 cylinders\nLOOK Total Head Movement = 299 cylinders (More than 50% seek reduction!)"
+    },
+    {
+      "cardNumber": 7,
+      "badge": "7. Live Simulation",
+      "title": "Visual Simulation: Disk Head Movement",
+      "vfxType": "disk-head-sim",
+      "fullWorkingFlow": "Watch the mechanical disk head sweep across track cylinders to service requests. Compare how FCFS thrashes back and forth across the platter while LOOK and SCAN service requests in a smooth elevator sweep.",
+      "visualControls": [
+        "play",
+        "step",
+        "reset"
+      ]
+    },
+    {
+      "cardNumber": 8,
+      "badge": "8. Common Pitfalls",
+      "title": "Common Mistakes & Traps",
+      "traps": [
+        {
+          "mistake": "Confusing Hard Link with Soft (Symbolic) Link",
+          "correct": "A Hard Link points directly to the SAME Inode number (cannot cross filesystems; deleting original file keeps data intact). A Soft Link is a separate file containing the PATH string of the target (can cross filesystems; deleting original creates a broken link).",
+          "why": "Tested in nearly every system programming and OS placement interview."
+        },
+        {
+          "mistake": "Assuming SCAN and LOOK both visit the end of the disk (cylinder 0 and 199)",
+          "correct": "SCAN travels all the way to the boundary cylinder (0 or 199) regardless of whether a request exists there. LOOK reverses immediately after servicing the final pending request in that direction.",
+          "why": "Difference of (199 - max_request) in numerical calculations."
+        },
+        {
+          "mistake": "Thinking file content is deleted when rm is called",
+          "correct": "rm only removes the directory entry and decrements the inode link count. If another process holds the file open, blocks remain allocated until the file descriptor is closed.",
+          "why": "Explains why Linux disk space does not free up until a crashing service is restarted."
+        }
+      ]
+    },
+    {
+      "cardNumber": 9,
+      "badge": "9. Interview Mastery",
+      "title": "Interview & Placement Angle",
+      "questions": [
+        {
+          "q": "Given 4KB block size and 4-byte disk pointers, calculate the maximum file size supported by an Inode with 12 direct, 1 single indirect, 1 double indirect, and 1 triple indirect pointer.",
+          "a": "Number of pointers per indirect block = 4096 / 4 = 1024 pointers (2^10).\n- Direct: 12 * 4KB = 48 KB\n- Single Indirect: 1024 * 4KB = 4 MB\n- Double Indirect: 1024 * 1024 * 4KB = 4 GB\n- Triple Indirect: 1024^3 * 4KB = 4 TB\nTotal Max File Size = 48 KB + 4 MB + 4 GB + 4 TB ≈ 4.004 TB.",
+          "tip": "Show all 4 tiers clearly; interviewers look for the 1024^3 term."
+        },
+        {
+          "q": "Why is C-SCAN (Circular SCAN) preferred over standard SCAN in heavy server workloads?",
+          "a": "Standard SCAN provides uneven waiting times: sectors at the ends wait less than sectors in the middle when the arm reverses. C-SCAN provides uniform waiting time by only servicing in one direction, then immediately returning to the beginning without servicing requests on the return trip.",
+          "tip": "Key phrase: \"Provides more uniform waiting times across all cylinders.\""
+        }
+      ]
+    },
+    {
+      "cardNumber": 10,
+      "badge": "10. Quick Revision",
+      "title": "Quick Revision & Cheat Sheet",
+      "cheatSheet": {
+        "keyRule": "Inodes store metadata and block pointers; Directories map filenames to Inode numbers.",
+        "summaryPoints": [
+          "Inode contains permissions, size, timestamps, and 15 block pointers (Direct, Single, Double, Triple).",
+          "Disk Scheduling: LOOK stops at highest request; SCAN goes all the way to disk edge (199).",
+          "C-SCAN only services requests in one direction, returning to start.",
+          "Hard Link shares Inode; Soft Link stores target path string.",
+          "Contiguous allocation has external fragmentation; Indexed allocation (Inodes) eliminates it."
+        ],
+        "examShortcut": "Total head movement in LOOK = (Max Request - Start) + (Max Request - Min Request) when moving up.",
+        "whenToUse": "Modern operating systems use ext4/XFS with B-trees and extent-based block mapping alongside elevator I/O schedulers."
+      }
+    }
+  ],
+  "fcfs": [
+    {
+      "cardNumber": 1,
+      "badge": "1. Concept Definition",
+      "title": "What is First-Come, First-Served (FCFS)?",
+      "definition": "FCFS is the simplest non-preemptive CPU scheduling algorithm where the process requesting the CPU first is allocated the CPU first using a FIFO (First-In, First-Out) queue.",
+      "inSimpleWords": "Just like people standing in a queue at an ATM: whoever arrives first is served first until completion.",
+      "whyInOS": "FCFS serves as the baseline scheduling algorithm against which more sophisticated algorithms are compared.",
+      "keyTerms": [
+        {
+          "term": "FIFO Queue",
+          "desc": "First-In First-Out queue data structure managing ready processes."
+        },
+        {
+          "term": "Non-Preemptive",
+          "desc": "Once a process gets the CPU, it runs until voluntary exit or I/O."
+        },
+        {
+          "term": "Convoy Effect",
+          "desc": "Short processes trapped behind a giant CPU-bound process."
+        }
+      ],
+      "analogy": "A single grocery store checkout line where a shopper with 1 item waits behind someone with 3 overflowing carts.",
+      "diagramType": "fcfs-queue"
+    },
+    {
+      "cardNumber": 2,
+      "badge": "2. The Core Problem",
+      "title": "Why do we need to understand FCFS limitations?",
+      "problem": "While trivial to implement, FCFS frequently produces terrible, wildly fluctuating average waiting times.",
+      "whatGoesWrong": "The Convoy Effect: A CPU-bound process P1 (burst 100ms) runs first; short I/O-bound processes P2 and P3 (burst 2ms) wait. I/O devices sit idle while users experience terrible latency.",
+      "osSolution": "Preemptive schedulers (Round Robin, SRTF) solve this by slicing long processes.",
+      "benefit": "Minimal scheduling overhead (O(1) queue operations) and zero process starvation.",
+      "realWorldExample": "Batch processing systems (like nightly database backup jobs) where tasks run sequentially without interactive users.",
+      "examTakeaway": "FCFS is non-preemptive and never suffers from starvation, but has high average waiting time."
+    },
+    {
+      "cardNumber": 3,
+      "badge": "3. Core Mechanism",
+      "title": "How FCFS Execution Works",
+      "mechanism": "Processes join the tail of the Ready Queue upon arrival. The dispatcher takes the head process and runs it to completion.",
+      "diagramType": "fcfs-flow",
+      "vfxType": "cpu-scheduling-sim",
+      "stateTransitions": [
+        "1. Process arrives at Time AT -> pushed to Ready Queue tail",
+        "2. CPU becomes free -> Head process popped",
+        "3. Process executes for entire Burst Time (BT) without interruption",
+        "4. Process terminates at CT = Current_Time + BT"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Queue Arrival",
+          "desc": "Timestamp recorded as Arrival Time (AT)."
+        },
+        {
+          "step": 2,
+          "title": "Non-preemptive Run",
+          "desc": "Runs uninterrupted for duration BT."
+        },
+        {
+          "step": 3,
+          "title": "Completion",
+          "desc": "Hands off CPU to next ready process."
+        }
+      ]
+    },
+    {
+      "cardNumber": 4,
+      "badge": "4. Internal Architecture",
+      "title": "FCFS Queue Data Structures",
+      "diagramType": "fifo-queue-struct",
+      "structureDetails": {
+        "Ready Queue Structure": "Singly linked list with head and tail pointers (O(1) insertion, O(1) removal)",
+        "PCB Scheduling Fields": "Arrival timestamp, remaining burst (equals total burst in FCFS)",
+        "Context Switch Frequency": "Exactly 1 context switch per process execution (minimal overhead)"
+      },
+      "componentRoles": "Simplicity is FCFS's main virtue: zero priority calculations or complex heap trees."
+    },
+    {
+      "cardNumber": 5,
+      "badge": "5. Step-by-Step Execution",
+      "title": "Step-by-Step: Handling CPU Idle Intervals",
+      "scenario": "Process P1 arrives at t=0 with BT=3. Next process P2 arrives at t=5 with BT=2.",
+      "challenge": "Handling the idle CPU gap between t=3 and t=5 correctly in Gantt charts.",
+      "flowSteps": [
+        {
+          "num": 1,
+          "action": "P1 Runs",
+          "detail": "Runs from t=0 to t=3. P1 completes at CT=3."
+        },
+        {
+          "num": 2,
+          "action": "CPU Idle Period",
+          "detail": "From t=3 to t=5, Ready Queue is empty! CPU remains idle for 2ms."
+        },
+        {
+          "num": 3,
+          "action": "P2 Arrival & Run",
+          "detail": "P2 arrives at t=5 and starts immediately; runs from t=5 to t=7."
+        },
+        {
+          "num": 4,
+          "action": "Gantt Chart Representation",
+          "detail": "| P1 (0–3) | IDLE (3–5) | P2 (5–7) |"
+        }
+      ],
+      "resolution": "Never assume CPU executes P2 at t=3 if P2 has not arrived yet!"
+    },
+    {
+      "cardNumber": 6,
+      "badge": "6. Numerical Walkthrough",
+      "title": "Numerical Example: FCFS with Staggered Arrivals",
+      "isNumerical": true,
+      "question": "Calculate Completion Time (CT), Turnaround Time (TAT), Waiting Time (WT), and Average WT for P1, P2, P3, P4.",
+      "givenData": {
+        "P1": "AT = 0, BT = 4",
+        "P2": "AT = 1, BT = 3",
+        "P3": "AT = 2, BT = 1",
+        "P4": "AT = 3, BT = 2"
+      },
+      "formula": "TAT = CT - AT\nWT = TAT - BT",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "title": "Gantt Chart Construction",
+          "detail": "| P1 (0–4) | P2 (4–7) | P3 (7–8) | P4 (8–10) |"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Compute CT for Each Process",
+          "detail": "P1 CT = 4\nP2 CT = 7\nP3 CT = 8\nP4 CT = 10"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Compute TAT = CT - AT",
+          "detail": "P1: 4 - 0 = 4\nP2: 7 - 1 = 6\nP3: 8 - 2 = 6\nP4: 10 - 3 = 7\nTotal TAT = 23. Avg TAT = 23 / 4 = 5.75"
+        },
+        {
+          "stepNumber": 4,
+          "title": "Compute WT = TAT - BT",
+          "detail": "P1: 4 - 4 = 0\nP2: 6 - 3 = 3\nP3: 6 - 1 = 5\nP4: 7 - 2 = 5\nTotal WT = 13. Avg WT = 13 / 4 = 3.25"
+        }
+      ],
+      "finalAnswer": "Average Turnaround Time = 5.75\nAverage Waiting Time = 3.25"
+    },
+    {
+      "cardNumber": 7,
+      "badge": "7. Live Simulation",
+      "title": "Visual Simulation: FCFS Queue Execution",
+      "vfxType": "cpu-scheduling-sim",
+      "fullWorkingFlow": "Watch processes queue up in arrival order and execute on the CPU without preemption, demonstrating how earlier arrivals block subsequent processes regardless of burst length.",
+      "visualControls": [
+        "play",
+        "step",
+        "reset"
+      ]
+    },
+    {
+      "cardNumber": 8,
+      "badge": "8. Common Pitfalls",
+      "title": "Common Mistakes & Traps",
+      "traps": [
+        {
+          "mistake": "Scheduling processes in numerical PID order (P1, P2, P3) instead of Arrival Time order",
+          "correct": "Always sort processes by Arrival Time (AT) first! If P2 arrives at t=0 and P1 arrives at t=2, P2 runs first.",
+          "why": "A classic exam trick designed to catch students who read process IDs instead of arrival times."
+        },
+        {
+          "mistake": "Assuming Response Time is different from Waiting Time in FCFS",
+          "correct": "Because FCFS is strictly non-preemptive, Response Time (First Run - AT) is mathematically identical to Waiting Time.",
+          "why": "Only preemptive schedulers have RT != WT."
+        }
+      ]
+    },
+    {
+      "cardNumber": 9,
+      "badge": "9. Interview Mastery",
+      "title": "Interview & Placement Angle",
+      "questions": [
+        {
+          "q": "Can FCFS ever cause starvation?",
+          "a": "No. Because the queue is FIFO and bursts are finite, every process will eventually reach the head of the queue and execute. FCFS is completely starvation-free.",
+          "tip": "Contrast this with SJF or Priority, which can starve long/low-priority jobs indefinitely."
+        }
+      ]
+    },
+    {
+      "cardNumber": 10,
+      "badge": "10. Quick Revision",
+      "title": "Quick Revision & Cheat Sheet",
+      "cheatSheet": {
+        "keyRule": "FCFS: Non-preemptive, FIFO arrival order, zero starvation, prone to Convoy Effect.",
+        "summaryPoints": [
+          "Non-preemptive: Process runs until burst completes.",
+          "Convoy Effect: Big CPU job blocks multiple small I/O jobs.",
+          "Response Time == Waiting Time.",
+          "Gantt chart must account for CPU idle gaps."
+        ],
+        "examShortcut": "In FCFS, sort table rows by Arrival Time (AT) before drawing the Gantt chart.",
+        "whenToUse": "Batch processing, background queues, and simple embedded systems with low concurrency."
+      }
+    }
+  ],
+  "sjf-srtf": [
+    {
+      "cardNumber": 1,
+      "badge": "1. Concept Definition",
+      "title": "What is SJF & SRTF Scheduling?",
+      "definition": "Shortest Job First (SJF) selects the waiting process with the smallest CPU burst. Shortest Remaining Time First (SRTF) is the preemptive variant where a running process is preempted if a newly arrived process has a shorter remaining burst time.",
+      "inSimpleWords": "Like an express checkout lane: whoever has the fewest items to buy gets checked out first.",
+      "whyInOS": "SJF is provably mathematically optimal in giving the minimum average waiting time among all scheduling algorithms.",
+      "keyTerms": [
+        {
+          "term": "SJF (Non-Preemptive)",
+          "desc": "Process runs to completion once allocated the CPU."
+        },
+        {
+          "term": "SRTF (Preemptive SJF)",
+          "desc": "Running process is preempted if new arrival has smaller remaining burst."
+        },
+        {
+          "term": "Starvation",
+          "desc": "Long processes may wait indefinitely if short processes keep arriving."
+        }
+      ],
+      "analogy": "Clearing your inbox by answering all 30-second emails first before opening a 3-hour project spreadsheet.",
+      "diagramType": "sjf-comparison"
+    },
+    {
+      "cardNumber": 2,
+      "badge": "2. The Core Problem",
+      "title": "Why do we need SJF / SRTF?",
+      "problem": "FCFS leads to long waiting times if large jobs run first. How can we mathematically minimize average waiting time?",
+      "whatGoesWrong": "Without shortest-job prioritization, short jobs wait unnecessarily, ballooning the system-wide average waiting time.",
+      "osSolution": "Sort ready processes by remaining burst time so quick tasks finish immediately and exit the system.",
+      "benefit": "Provably minimal average waiting time and maximal interactive throughput.",
+      "realWorldExample": "Web search engines ranking and returning fast cached query results in 1ms before executing heavy multi-second database aggregations.",
+      "examTakeaway": "SJF gives the absolute minimum average waiting time for a given set of processes."
+    },
+    {
+      "cardNumber": 3,
+      "badge": "3. Core Mechanism",
+      "title": "How SRTF Preemption Operates",
+      "mechanism": "On every process arrival event, the scheduler compares remaining burst of running process with the burst of the new arrival.",
+      "diagramType": "srtf-flow",
+      "vfxType": "cpu-scheduling-sim",
+      "stateTransitions": [
+        "1. Process P_new arrives at time t",
+        "2. Scheduler compares Remaining_Time(P_running) with Burst_Time(P_new)",
+        "3. If Burst_Time(P_new) < Remaining_Time(P_running): P_running preempted!",
+        "4. P_running returned to Ready Queue; P_new dispatched to CPU"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Arrival Evaluation",
+          "desc": "Triggered whenever a new process enters the ready queue."
+        },
+        {
+          "step": 2,
+          "title": "Remaining Time Check",
+          "desc": "Smallest remaining burst wins the CPU."
+        },
+        {
+          "step": 3,
+          "title": "Context Switch",
+          "desc": "Preempts running process if incoming process is shorter."
+        }
+      ]
+    },
+    {
+      "cardNumber": 4,
+      "badge": "4. Internal Architecture",
+      "title": "Predicting Future CPU Bursts",
+      "diagramType": "burst-prediction",
+      "structureDetails": {
+        "Exponential Average Formula": "tau_{n+1} = alpha * t_n + (1 - alpha) * tau_n",
+        "t_n": "Actual duration of the nth CPU burst",
+        "tau_n": "Predicted duration of the nth CPU burst",
+        "alpha (Smoothing Factor)": "Weighting parameter (0 <= alpha <= 1, commonly 0.5)"
+      },
+      "componentRoles": "Because an OS cannot foresee the future, it uses historical exponential smoothing to estimate the next CPU burst."
+    },
+    {
+      "cardNumber": 5,
+      "badge": "5. Step-by-Step Execution",
+      "title": "Step-by-Step: Tracing SRTF Preemption",
+      "scenario": "P1 running with 7ms left. P2 arrives with total burst 4ms.",
+      "challenge": "P2 has shorter burst than P1 remaining time. Preemption must execute cleanly.",
+      "flowSteps": [
+        {
+          "num": 1,
+          "action": "Time Comparison",
+          "detail": "Remaining(P1) = 7ms vs BT(P2) = 4ms. Since 4 < 7, P2 takes the CPU."
+        },
+        {
+          "num": 2,
+          "action": "P1 Preemption",
+          "detail": "Dispatcher saves P1 context; records remaining burst as 7ms in PCB."
+        },
+        {
+          "num": 3,
+          "action": "P2 Execution",
+          "detail": "P2 executes until completion (or until an even shorter job arrives)."
+        },
+        {
+          "num": 4,
+          "action": "Resume P1",
+          "detail": "When P2 finishes, P1 resumes for its remaining 7ms."
+        }
+      ],
+      "resolution": "Average waiting time is significantly reduced compared to letting P1 run for 7ms first."
+    },
+    {
+      "cardNumber": 6,
+      "badge": "6. Numerical Walkthrough",
+      "title": "Numerical Example: SRTF (Preemptive SJF)",
+      "isNumerical": true,
+      "question": "Given 4 processes with Arrival Times and Burst Times, compute the Gantt chart, Completion Times, and Average Waiting Time under SRTF.",
+      "givenData": {
+        "P1": "AT = 0, BT = 8",
+        "P2": "AT = 1, BT = 4",
+        "P3": "AT = 2, BT = 9",
+        "P4": "AT = 3, BT = 5"
+      },
+      "formula": "TAT = CT - AT\nWT = TAT - BT",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "title": "Gantt Chart Construction Step-by-Step",
+          "detail": "t=0: Only P1 is ready. P1 runs from 0 to 1 (remaining P1=7).\nt=1: P2 arrives (BT=4). Since 4 < 7, P2 preempts P1! P2 runs.\nt=2: P3 arrives (BT=9). Remaining: P2=3, P1=7, P3=9. P2 continues.\nt=3: P4 arrives (BT=5). Remaining: P2=2, P4=5, P1=7, P3=9. P2 continues.\nt=5: P2 finishes! Remaining: P4=5, P1=7, P3=9. P4 runs (5 to 10).\nt=10: P4 finishes! Remaining: P1=7, P3=9. P1 runs (10 to 17).\nt=17: P1 finishes! P3 runs (17 to 26).\nGantt: | P1 (0-1) | P2 (1-5) | P4 (5-10) | P1 (10-17) | P3 (17-26) |"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Completion Times (CT)",
+          "detail": "P2 CT = 5\nP4 CT = 10\nP1 CT = 17\nP3 CT = 26"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Turnaround Times (TAT = CT - AT)",
+          "detail": "P1: 17 - 0 = 17\nP2: 5 - 1 = 4\nP3: 26 - 2 = 24\nP4: 10 - 3 = 7\nTotal TAT = 52. Avg TAT = 52 / 4 = 13"
+        },
+        {
+          "stepNumber": 4,
+          "title": "Waiting Times (WT = TAT - BT)",
+          "detail": "P1: 17 - 8 = 9\nP2: 4 - 4 = 0\nP3: 24 - 9 = 15\nP4: 7 - 5 = 2\nTotal WT = 26. Avg WT = 26 / 4 = 6.5"
+        }
+      ],
+      "finalAnswer": "Average Turnaround Time = 13\nAverage Waiting Time = 6.5 (Optimal!)"
+    },
+    {
+      "cardNumber": 7,
+      "badge": "7. Live Simulation",
+      "title": "Visual Simulation: SRTF Execution",
+      "vfxType": "cpu-scheduling-sim",
+      "fullWorkingFlow": "Watch incoming processes with shorter bursts preempt running tasks on the CPU. Observe the Gantt chart segmenting processes and dynamically recalculating optimal waiting times.",
+      "visualControls": [
+        "play",
+        "step",
+        "reset"
+      ]
+    },
+    {
+      "cardNumber": 8,
+      "badge": "8. Common Pitfalls",
+      "title": "Common Mistakes & Traps",
+      "traps": [
+        {
+          "mistake": "Comparing original Burst Time instead of REMAINING Burst Time during SRTF preemption",
+          "correct": "Always compare the incoming burst against the remaining burst of the currently running process (NOT its original burst).",
+          "why": "If P1 originally had BT=10 and has executed for 7ms, its remaining burst is 3ms. An incoming P2 with BT=4 will NOT preempt P1!"
+        },
+        {
+          "mistake": "Claiming SJF is completely starvation-free",
+          "correct": "SJF and SRTF suffer from severe STARVATION for long processes if a steady stream of short processes keeps arriving.",
+          "why": "Aging is required to prevent long processes from starving indefinitely."
+        }
+      ]
+    },
+    {
+      "cardNumber": 9,
+      "badge": "9. Interview Mastery",
+      "title": "Interview & Placement Angle",
+      "questions": [
+        {
+          "q": "Why is SJF called provably optimal for minimizing average waiting time?",
+          "a": "Moving a shorter job before a longer job decreases the waiting time of the shorter job by more than it increases the waiting time of the longer job, strictly reducing the overall sum of waiting times.",
+          "tip": "State: \"By scheduling the shortest burst first, the waiting time of all subsequent jobs decreases.\""
+        }
+      ]
+    },
+    {
+      "cardNumber": 10,
+      "badge": "10. Quick Revision",
+      "title": "Quick Revision & Cheat Sheet",
+      "cheatSheet": {
+        "keyRule": "SJF/SRTF: Provably optimal average waiting time; susceptible to starvation of long jobs.",
+        "summaryPoints": [
+          "SJF is non-preemptive; SRTF is preemptive.",
+          "Preemption condition: New Arrival BT < Running Process Remaining BT.",
+          "Burst prediction: tau_{n+1} = alpha * t_n + (1 - alpha) * tau_n.",
+          "Cure for starvation: Aging."
+        ],
+        "examShortcut": "At each arrival timestamp in SRTF, pause and write down the remaining burst of all available processes before deciding.",
+        "whenToUse": "Specialized batch systems and job queues where job sizes are well-estimated beforehand."
+      }
+    }
+  ],
+  "round-robin": [
+    {
+      "cardNumber": 1,
+      "badge": "1. Concept Definition",
+      "title": "What is Round Robin (RR) Scheduling?",
+      "definition": "Round Robin is a preemptive CPU scheduling algorithm designed for time-sharing systems where each ready process is assigned a fixed time slice called a Time Quantum (q). When the quantum expires, the process is preempted and moved to the tail of the ready queue.",
+      "inSimpleWords": "Like a teacher giving each student in a circle 2 minutes to speak. If you need more time, you wait for your turn again as the teacher moves around the circle.",
+      "whyInOS": "Interactive systems require fast response times. Round Robin ensures no single process can hog the CPU while others wait.",
+      "keyTerms": [
+        {
+          "term": "Time Quantum (q)",
+          "desc": "The fixed slice of CPU time (typically 10–100ms) allocated to a process."
+        },
+        {
+          "term": "Circular Queue",
+          "desc": "Queue where preempted processes cycle back to the tail."
+        },
+        {
+          "term": "Preemption",
+          "desc": "Hardware timer interrupt halts process execution when quantum finishes."
+        }
+      ],
+      "analogy": "Sharing a video game controller among 4 friends by passing it every 5 minutes.",
+      "diagramType": "circular-queue"
+    },
+    {
+      "cardNumber": 2,
+      "badge": "2. The Core Problem",
+      "title": "Why do we need Round Robin?",
+      "problem": "In desktop and cloud systems, multiple users and applications need immediate responsiveness (typing in a terminal, moving a mouse).",
+      "whatGoesWrong": "Under FCFS or SJF, a single compiling task can freeze the user interface for 30 seconds.",
+      "osSolution": "By dividing CPU time into small quanta, every process gets a share of CPU every (n-1)*q time units, providing the illusion of simultaneous execution.",
+      "benefit": "Guaranteed bounded response time, zero starvation, and excellent interactive performance.",
+      "realWorldExample": "A web server handling 10,000 HTTP requests: each socket gets quick CPU slices so all clients receive packet responses concurrently.",
+      "examTakeaway": "Round Robin is starvation-free. If quantum is large, RR becomes FCFS; if quantum is very small, context switch overhead kills performance."
+    },
+    {
+      "cardNumber": 3,
+      "badge": "3. Core Mechanism",
+      "title": "How Round Robin Cycles Processes",
+      "mechanism": "The ready queue is maintained as a FIFO queue. The timer interrupts the CPU when quantum q expires.",
+      "diagramType": "rr-cycle-flow",
+      "vfxType": "cpu-scheduling-sim",
+      "stateTransitions": [
+        "1. Head process popped from ready queue and assigned CPU",
+        "2. Timer set to interrupt after Time Quantum q",
+        "3. If process finishes within q: terminates and frees CPU",
+        "4. If process exceeds q: timer fires, context switch saves state, pushed to queue tail"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Dispatch",
+          "desc": "Allocate CPU to queue head."
+        },
+        {
+          "step": 2,
+          "title": "Quantum Execution",
+          "desc": "Runs for min(Remaining_Burst, Quantum)."
+        },
+        {
+          "step": 3,
+          "title": "Re-queue",
+          "desc": "Preempted process added to tail; next process runs."
+        }
+      ]
+    },
+    {
+      "cardNumber": 4,
+      "badge": "4. Internal Architecture",
+      "title": "Selecting the Optimal Time Quantum",
+      "diagramType": "quantum-tradeoff",
+      "structureDetails": {
+        "Too Small Quantum (< 1ms)": "System spends most CPU cycles performing context switches; throughput collapses",
+        "Too Large Quantum (> 1s)": "Degenerates into FCFS; interactive response time becomes sluggish",
+        "Rule of Thumb": "80% of CPU bursts should be shorter than the time quantum q (typically 10ms–100ms)",
+        "Context Switch Ratio": "Context switch time should be < 1% of time quantum duration"
+      },
+      "componentRoles": "Balancing context switch latency against user responsiveness is the central tuning challenge in Round Robin."
+    },
+    {
+      "cardNumber": 5,
+      "badge": "5. Step-by-Step Execution",
+      "title": "Step-by-Step: The Quantum Expiration Boundary Rule",
+      "scenario": "Process P1 quantum expires at t=4. At the exact same time t=4, a new process P3 arrives.",
+      "challenge": "Who enters the Ready Queue first: the new arrival P3, or the preempted process P1?",
+      "flowSteps": [
+        {
+          "num": 1,
+          "action": "Standard OS Rule",
+          "detail": "The newly arrived process P3 enters the Ready Queue FIRST."
+        },
+        {
+          "num": 2,
+          "action": "Preempted Process Queueing",
+          "detail": "The preempted process P1 is added to the Ready Queue tail AFTER P3."
+        },
+        {
+          "num": 3,
+          "action": "Queue Order at t=4",
+          "detail": "Ready Queue becomes: [ ... existing ready processes ..., P3, P1 ]."
+        },
+        {
+          "num": 4,
+          "action": "Dispatch Next",
+          "detail": "The process at the head of the queue is dispatched."
+        }
+      ],
+      "resolution": "Ensures fairness for newly arriving processes."
+    },
+    {
+      "cardNumber": 6,
+      "badge": "6. Numerical Walkthrough",
+      "title": "Numerical Example: Round Robin (Quantum = 2)",
+      "isNumerical": true,
+      "question": "Calculate Completion Time (CT), Turnaround Time (TAT), Waiting Time (WT), and Average WT for P1, P2, P3, P4 with Time Quantum = 2.",
+      "givenData": {
+        "Time Quantum": "q = 2",
+        "P1": "AT = 0, BT = 5",
+        "P2": "AT = 1, BT = 4",
+        "P3": "AT = 2, BT = 2",
+        "P4": "AT = 4, BT = 1"
+      },
+      "formula": "TAT = CT - AT\nWT = TAT - BT",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "title": "Trace Ready Queue and Gantt Chart",
+          "detail": "t=0: Queue=[P1]. P1 runs for 2ms (0-2). Remaining P1=3.\nDuring (0-2), P2 arrives at 1, P3 arrives at 2. Queue=[P2, P3, P1].\nt=2: P2 runs for 2ms (2-4). Remaining P2=2. P4 arrives at 4. Queue=[P3, P1, P4, P2].\nt=4: P3 runs for 2ms (4-6). P3 finishes at 6! Queue=[P1, P4, P2].\nt=6: P1 runs for 2ms (6-8). Remaining P1=1. Queue=[P4, P2, P1].\nt=8: P4 runs for 1ms (8-9). P4 finishes at 9! Queue=[P2, P1].\nt=9: P2 runs for 2ms (9-11). P2 finishes at 11! Queue=[P1].\nt=11: P1 runs for 1ms (11-12). P1 finishes at 12!\nGantt: | P1 (0-2) | P2 (2-4) | P3 (4-6) | P1 (6-8) | P4 (8-9) | P2 (9-11) | P1 (11-12) |"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Calculate Completion Times (CT)",
+          "detail": "P3 CT = 6\nP4 CT = 9\nP2 CT = 11\nP1 CT = 12"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Calculate Turnaround Times (TAT = CT - AT)",
+          "detail": "P1: 12 - 0 = 12\nP2: 11 - 1 = 10\nP3: 6 - 2 = 4\nP4: 9 - 4 = 5\nTotal TAT = 31. Avg TAT = 31 / 4 = 7.75"
+        },
+        {
+          "stepNumber": 4,
+          "title": "Calculate Waiting Times (WT = TAT - BT)",
+          "detail": "P1: 12 - 5 = 7\nP2: 10 - 4 = 6\nP3: 4 - 2 = 2\nP4: 5 - 1 = 4\nTotal WT = 19. Avg WT = 19 / 4 = 4.75"
+        }
+      ],
+      "finalAnswer": "Average Turnaround Time = 7.75\nAverage Waiting Time = 4.75"
+    },
+    {
+      "cardNumber": 7,
+      "badge": "7. Live Simulation",
+      "title": "Visual Simulation: Circular Queue Execution",
+      "vfxType": "cpu-scheduling-sim",
+      "fullWorkingFlow": "Watch the circular ready queue rotate processes through the CPU core. See the time quantum countdown timer slice execution into equal chunks and trace the resulting multi-piece Gantt chart.",
+      "visualControls": [
+        "play",
+        "step",
+        "reset"
+      ]
+    },
+    {
+      "cardNumber": 8,
+      "badge": "8. Common Pitfalls",
+      "title": "Common Mistakes & Traps",
+      "traps": [
+        {
+          "mistake": "Putting the preempted process before the new arrival in the ready queue",
+          "correct": "Always put newly arriving processes into the queue BEFORE appending the preempted process whose quantum just expired.",
+          "why": "Reversing this order completely corrupts the Gantt chart and gives wrong answers."
+        },
+        {
+          "mistake": "Assuming Round Robin always gives lower average waiting time than FCFS",
+          "correct": "If all processes have identical burst times equal to the quantum, Round Robin gives the WORST possible average turnaround time because all processes finish together at the very end.",
+          "why": "Favorite theoretical interview question on RR limitations."
+        }
+      ]
+    },
+    {
+      "cardNumber": 9,
+      "badge": "9. Interview Mastery",
+      "title": "Interview & Placement Angle",
+      "questions": [
+        {
+          "q": "What happens if the time quantum q approaches infinity? What if q approaches zero?",
+          "a": "If q -> infinity, Round Robin degenerates into FCFS. If q -> 0, RR approaches Processor Sharing (pure theoretical concurrency), but in practice the system crashes because CPU time is consumed 100% by context switching.",
+          "tip": "Mention: \"Context switch overhead limits the minimum practical value of q.\""
+        }
+      ]
+    },
+    {
+      "cardNumber": 10,
+      "badge": "10. Quick Revision",
+      "title": "Quick Revision & Cheat Sheet",
+      "cheatSheet": {
+        "keyRule": "Round Robin: Preemptive, time-sliced, starvation-free, optimal for interactive systems.",
+        "summaryPoints": [
+          "Preemption triggered by timer interrupt after Time Quantum q.",
+          "Arrival tie-breaker: New arrival enters queue BEFORE preempted process.",
+          "Response time is bounded: at most (n-1)*q before a process gets CPU.",
+          "If q is very large -> FCFS; if q is very small -> high overhead."
+        ],
+        "examShortcut": "Always maintain an explicit Ready Queue scratchpad column for each timestamp when solving RR numericals.",
+        "whenToUse": "General-purpose desktop OS, web application request handling, and interactive microservices."
+      }
+    }
+  ],
+  "priority-scheduling": [
+    {
+      "cardNumber": 1,
+      "badge": "1. Concept Definition",
+      "title": "What is Priority Scheduling?",
+      "definition": "Priority Scheduling is a CPU scheduling algorithm where each process is assigned a numerical priority rank, and the CPU is allocated to the process with the highest priority. It can be either preemptive or non-preemptive.",
+      "inSimpleWords": "Like an emergency room triage: a patient with a critical injury is treated immediately before patients with routine minor injuries, regardless of who arrived first.",
+      "whyInOS": "Real-time and mission-critical tasks (kernel interrupts, device drivers, video rendering) must take precedence over background tasks (indexers, telemetry).",
+      "keyTerms": [
+        {
+          "term": "Priority Rank",
+          "desc": "Integer value (convention: lower number often indicates higher priority, e.g. 0 = highest)."
+        },
+        {
+          "term": "Preemptive Priority",
+          "desc": "Higher priority arrival immediately preempts running lower-priority task."
+        },
+        {
+          "term": "Aging",
+          "desc": "Technique of gradually increasing the priority of processes that wait in the system for a long time."
+        }
+      ],
+      "analogy": "An airport boarding queue: first-class passengers board before business class, who board before economy.",
+      "diagramType": "priority-queue"
+    },
+    {
+      "cardNumber": 2,
+      "badge": "2. The Core Problem",
+      "title": "Why do we need Priority Scheduling?",
+      "problem": "Not all processes are created equal. A kernel audio buffer starvation causes sound stuttering, whereas a 2-second delay in spell-checking is unnoticeable.",
+      "whatGoesWrong": "Without priority, critical system interrupts wait behind compute-heavy batch tasks, ruining user experience and real-time deadlines.",
+      "osSolution": "Assign priority ranks. Real-time tasks get higher priorities; background tasks get lower priorities.",
+      "benefit": "Guarantees urgent tasks meet deadlines and maximizes system responsiveness.",
+      "realWorldExample": "Anti-lock braking system (ABS) in a car: brake sensor thread preempts the dashboard radio display thread instantly.",
+      "examTakeaway": "The major problem with Priority Scheduling is Starvation (Indefinite Blocking). The solution is Aging."
+    },
+    {
+      "cardNumber": 3,
+      "badge": "3. Core Mechanism",
+      "title": "How Priority Preemption Works",
+      "mechanism": "The scheduler maintains ready processes sorted by priority. In preemptive mode, arrivals trigger immediate priority comparisons.",
+      "diagramType": "priority-flow",
+      "vfxType": "cpu-scheduling-sim",
+      "stateTransitions": [
+        "1. Running process P_curr has priority Prio(P_curr)",
+        "2. Process P_new arrives with priority Prio(P_new)",
+        "3. If Prio(P_new) is higher: P_curr is preempted immediately",
+        "4. Dispatcher runs context switch; P_new takes the CPU"
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "title": "Rank Check",
+          "desc": "Compare priority ranks of available processes."
+        },
+        {
+          "step": 2,
+          "title": "Tie-Breaker",
+          "desc": "Processes with equal priority are scheduled using FCFS."
+        },
+        {
+          "step": 3,
+          "title": "Aging Step",
+          "desc": "Periodically increment priority of waiting jobs."
+        }
+      ]
+    },
+    {
+      "cardNumber": 4,
+      "badge": "4. Internal Architecture",
+      "title": "Priority Queue Implementations",
+      "diagramType": "priority-heap",
+      "structureDetails": {
+        "Binary Min-Heap": "O(log n) insertion, O(1) peek highest priority, O(log n) removal",
+        "Multi-Level Queues": "Separate FIFO queues for each priority level (0 to 139 in Linux kernel)",
+        "Static Priority": "Fixed at process creation (e.g. nice values)",
+        "Dynamic Priority": "Adjusted dynamically by OS based on I/O wait time or Aging"
+      },
+      "componentRoles": "Linux CFS uses nice levels (-20 to +19) mapped to virtual runtime decay rates."
+    },
+    {
+      "cardNumber": 5,
+      "badge": "5. Step-by-Step Execution",
+      "title": "Step-by-Step: The Aging Mechanism",
+      "scenario": "A low-priority background process P_low (priority 50) has been waiting for 10 minutes.",
+      "challenge": "High-priority processes keep arriving, threatening P_low with indefinite starvation.",
+      "flowSteps": [
+        {
+          "num": 1,
+          "action": "Timer Tick Check",
+          "detail": "OS runs an aging routine every 100 milliseconds."
+        },
+        {
+          "num": 2,
+          "action": "Priority Increment",
+          "detail": "If P_low has waited more than threshold T, priority increases: 50 -> 49."
+        },
+        {
+          "num": 3,
+          "action": "Gradual Promotion",
+          "detail": "As time passes, priority reaches 40 -> 20 -> 5 -> 1."
+        },
+        {
+          "num": 4,
+          "action": "Guaranteed Execution",
+          "detail": "Eventually P_low becomes the highest priority process in the system and runs."
+        }
+      ],
+      "resolution": "Starvation is completely eliminated while maintaining priority responsiveness."
+    },
+    {
+      "cardNumber": 6,
+      "badge": "6. Numerical Walkthrough",
+      "title": "Numerical Example: Preemptive Priority Scheduling",
+      "isNumerical": true,
+      "question": "Calculate Completion Time, TAT, WT, and averages under Preemptive Priority Scheduling. Convention: LOWER number indicates HIGHER priority.",
+      "givenData": {
+        "P1": "AT = 0, BT = 4, Priority = 3",
+        "P2": "AT = 1, BT = 3, Priority = 1 (Highest)",
+        "P3": "AT = 2, BT = 1, Priority = 4 (Lowest)",
+        "P4": "AT = 3, BT = 2, Priority = 2"
+      },
+      "formula": "TAT = CT - AT\nWT = TAT - BT",
+      "steps": [
+        {
+          "stepNumber": 1,
+          "title": "Gantt Chart Construction",
+          "detail": "t=0: Only P1 is ready (Priority 3). P1 runs from 0 to 1 (remaining P1=3).\nt=1: P2 arrives (Priority 1). Priority 1 > 3! P2 preempts P1. P2 runs.\nt=2: P3 arrives (Priority 4). P2 has higher priority, continues.\nt=3: P4 arrives (Priority 2). P2 has higher priority, continues.\nt=4: P2 finishes at 4! Ready: P4 (prio 2, BT 2), P1 (prio 3, BT 3), P3 (prio 4, BT 1).\nP4 has highest priority (2), runs from 4 to 6.\nt=6: P4 finishes at 6! Ready: P1 (prio 3, BT 3), P3 (prio 4, BT 1).\nP1 runs from 6 to 9.\nt=9: P1 finishes at 9! P3 runs from 9 to 10.\nGantt: | P1 (0-1) | P2 (1-4) | P4 (4-6) | P1 (6-9) | P3 (9-10) |"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Calculate Completion Times (CT)",
+          "detail": "P2 CT = 4\nP4 CT = 6\nP1 CT = 9\nP3 CT = 10"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Calculate Turnaround Times (TAT = CT - AT)",
+          "detail": "P1: 9 - 0 = 9\nP2: 4 - 1 = 3\nP3: 10 - 2 = 8\nP4: 6 - 3 = 3\nTotal TAT = 23. Avg TAT = 23 / 4 = 5.75"
+        },
+        {
+          "stepNumber": 4,
+          "title": "Calculate Waiting Times (WT = TAT - BT)",
+          "detail": "P1: 9 - 4 = 5\nP2: 3 - 3 = 0\nP3: 8 - 1 = 7\nP4: 3 - 2 = 1\nTotal WT = 13. Avg WT = 13 / 4 = 3.25"
+        }
+      ],
+      "finalAnswer": "Average Turnaround Time = 5.75\nAverage Waiting Time = 3.25"
+    },
+    {
+      "cardNumber": 7,
+      "badge": "7. Live Simulation",
+      "title": "Visual Simulation: Priority Queue Dispatch",
+      "vfxType": "cpu-scheduling-sim",
+      "fullWorkingFlow": "Watch high-priority processes jump ahead of lower-priority processes in the ready queue. See preemptions occur immediately when high-priority tasks arrive, and observe Aging promote waiting tasks.",
+      "visualControls": [
+        "play",
+        "step",
+        "reset"
+      ]
+    },
+    {
+      "cardNumber": 8,
+      "badge": "8. Common Pitfalls",
+      "title": "Common Mistakes & Traps",
+      "traps": [
+        {
+          "mistake": "Failing to check whether lower or higher number represents higher priority",
+          "correct": "ALWAYS read the question! In UNIX and GATE exams, 0 is often highest priority; in other contexts, 10 is highest. Never assume without checking.",
+          "why": "A trivial misunderstanding of priority convention reverses the entire Gantt chart."
+        },
+        {
+          "mistake": "Forgetting that SJF is simply Priority Scheduling where priority = 1 / Burst Time",
+          "correct": "SJF is a special mathematical case of priority scheduling where priority is inversely proportional to burst time.",
+          "why": "Frequently tested in theoretical multiple-choice exams."
+        }
+      ]
+    },
+    {
+      "cardNumber": 9,
+      "badge": "9. Interview Mastery",
+      "title": "Interview & Placement Angle",
+      "questions": [
+        {
+          "q": "What is Priority Inversion and how does Priority Inheritance solve it?",
+          "a": "Priority Inversion occurs when a low-priority thread holds a lock needed by a high-priority thread, but a medium-priority thread preempts the low-priority thread, indirectly delaying the high-priority thread. Priority Inheritance solves it by temporarily raising the priority of the lock-holding thread to match the highest waiting thread.",
+          "tip": "Cite the Mars Pathfinder spacecraft real-world incident."
+        }
+      ]
+    },
+    {
+      "cardNumber": 10,
+      "badge": "10. Quick Revision",
+      "title": "Quick Revision & Cheat Sheet",
+      "cheatSheet": {
+        "keyRule": "Highest priority runs first. Starvation cured by Aging. Check numerical convention!",
+        "summaryPoints": [
+          "Preemptive: Higher priority arrival interrupts running process.",
+          "Non-preemptive: Running process finishes burst before priority check.",
+          "Aging gradually increases priority of waiting tasks over time.",
+          "Equal priority broken by FCFS arrival order."
+        ],
+        "examShortcut": "Before solving, write \"LOW NUMBER = HIGH PRIORITY\" or vice versa at the top of your paper.",
+        "whenToUse": "Real-time operating systems (RTOS), kernel interrupt dispatching, and multi-tier priority microservices."
+      }
+    }
+  ]
+}

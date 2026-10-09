@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PathPilot - Adaptive Placement Preparation</title>
+    <script>
+      try {
+        const key = 'pathpilot_theme_preference';
+        const allowed = ['light', 'dark', 'study'];
+        const saved = localStorage.getItem(key);
+        const theme = allowed.includes(saved) ? saved : 'light';
+        if (saved !== null && !allowed.includes(saved)) localStorage.removeItem(key);
+        document.documentElement.dataset.theme = theme;
+        if (theme === 'dark') document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+      } catch {
+        document.documentElement.dataset.theme = 'light';
+      }
+    </script>
+  </head>
+  <body class="bg-slate-50 text-slate-900 font-sans antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
